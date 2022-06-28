@@ -1,0 +1,7 @@
+﻿@model Charismatic.Web.Views.Shared.Components.CaseCreationWizard.CaseCreationWizardViewModel
+<ul class="list-unstyled steps mb-5">
+    @foreach (var step in Model.Steps)
+    {
+        <CaseCreationStep step="@step" active="@(step==Model.CurrentStep)"></CaseCreationStep>
+    }
+</ul>

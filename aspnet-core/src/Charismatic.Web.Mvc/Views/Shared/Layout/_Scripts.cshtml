@@ -1,0 +1,408 @@
+﻿@using System.Globalization
+@inject Charismatic.Timing.AppTimes AppTimes
+@using Charismatic.Configuration
+@inject Charismatic.Timing.AppTimes AppTimes
+@{
+    var uiTheme = await SettingManager.GetSettingValueAsync(AppSettingNames.UiTheme);
+    string style = "ltr";
+    bool isRTL = false;
+
+    if (System.Threading.Thread.CurrentThread.CurrentUICulture.Name == "ar-EG")
+    {
+        style = "rtl";
+        isRTL = true;
+    }
+}
+
+
+
+<script type="text/javascript">
+
+    document.querySelector(".your_class").addEventListener("keypress", function (evt) {
+        if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57) {
+            evt.preventDefault();
+        }
+    });
+        // This is used to get the application's root path from javascript.
+        // It's useful if you're running application in a virtual directory under IIS.
+        var abp = abp || {};
+    abp.appPath = '@ApplicationPath'
+
+</script>
+
+<environment names="Development">
+    @*core scripts start*@
+    <script src="~/libs/jquery/jquery.js" asp-append-version="true"></script>
+
+
+    @*admin-lte scripts start*@
+    <!--<script src="~/libs/bootstrap/dist/js/bootstrap.bundle.js" asp-append-version="true"></script>
+        <script src="~/libs/datatables/js/jquery.dataTables.min.js" asp-append-version="true"></script>
+        <script src="~/libs/datatables/js/dataTables.bootstrap4.min.js" asp-append-version="true"></script>
+        <script src="~/libs/datatables/js/dataTables.responsive.min.js" asp-append-version="true"></script>
+        <script src="~/libs/datatables/js/responsive.bootstrap4.min.js" asp-append-version="true"></script>
+        <script src="~/libs/datatables/js/dataTables.buttons.js" asp-append-version="true"></script>
+        <script src="~/libs/datatables/js/buttons.bootstrap4.js" asp-append-version="true"></script>
+        <script src="~/libs/admin-lte/dist/js/adminlte.js" asp-append-version="true"></script>-->
+    @*admin-lte scripts end*@
+
+    @*// abp scripts start*@
+    <script src="~/libs/block-ui/jquery.blockUI.js" asp-append-version="true"></script>
+    <script src="~/libs/spin/spin.js" asp-append-version="true"></script>
+    <script src="~/libs-ext/spin/jquery.spin.js" asp-append-version="true"></script>
+    <script src="~/libs/sweetalert/sweetalert.min.js" asp-append-version="true"></script>
+    <script src="~/libs/toastr/toastr.min.js" asp-append-version="true"></script>
+    <script src="~/libs/moment/moment-with-locales.js" asp-append-version="true"></script>
+    <script src="~/libs/signalr/dist/browser/signalr.js" asp-append-version="true"></script>
+    <script src="~/libs/abp-web-resources/Abp/Framework/scripts/abp.js" asp-append-version="true"></script>
+    <script src="~/libs/abp-web-resources/Abp/Framework/scripts/libs/abp.jquery.js" asp-append-version="true"></script>
+    <script src="~/libs/abp-web-resources/Abp/Framework/scripts/libs/abp.toastr.js" asp-append-version="true"></script>
+    <script src="~/libs/abp-web-resources/Abp/Framework/scripts/libs/abp.blockUI.js" asp-append-version="true"></script>
+    <script src="~/libs/abp-web-resources/Abp/Framework/scripts/libs/abp.spin.js" asp-append-version="true"></script>
+    <script src="~/libs/abp-web-resources/Abp/Framework/scripts/libs/abp.sweet-alert.js" asp-append-version="true"></script>
+    <script src="~/libs/abp-web-resources/Abp/Framework/scripts/libs/abp.signalr-client.js" asp-append-version="true"></script>
+
+
+
+    <script src="~/libs/jquery-validate/jquery.validate.js" asp-append-version="true"></script>
+    <script src="~/libs/jquery-validate/jquery.validate.unobtrusive.js" asp-append-version="true"></script>
+    <script src="~/libs/push.js/push.js" asp-append-version="true"></script>
+
+
+
+    <script src="~/js/abp.dataTable.js" asp-append-version="true"></script>
+    <script src="~/js/main.js" asp-append-version="true"></script>
+
+
+
+</environment>
+
+<environment names="Staging,Production">
+    <script src="~/view-resources/Views/_Bundles/shared-layout.min.js" asp-append-version="true"></script>
+    <script src="~/js/main.js" asp-append-version="true"></script>
+</environment>
+<script src="~/js/popper.min.js"></script>
+<script src="~/js/bootstrap.min.js"></script>
+<!-- Dev Extreme -->
+<script src="~/js/devextreme/js/jszip.min.js" asp-append-version="true"></script>
+<script src="~/js/devextreme/js/dx.all.debug.js" asp-append-version="true"></script>
+<script src="~/js/devextreme/js/FileSaver.min.js" asp-append-version="true"></script>
+<script src="~/js/devextreme/js/exceljs.min.js" asp-append-version="true"></script>
+<script src="~/js/devextreme/js/dx.aspnet.data.js" asp-append-version="true"></script>
+
+<!-- Dynamic scripts of ABP system (They are created on runtime and can not be bundled) -->
+<script src="~/AbpServiceProxies/GetAll?v=@(AppTimes.StartupTime.Ticks)" type="text/javascript"></script>
+<script src="~/AbpScripts/GetScripts?v=@(AppTimes.StartupTime.Ticks)" type="text/javascript"></script>
+
+<script src=" ~/lib/signalr-client/signalr.min.js" asp-append-version="true"></script>
+<script src="~/lib/abp-web-resources/Abp/Framework/scripts/libs/abp.signalr-client.js" asp-append-version="true"></script>
+
+
+
+
+@if (CultureInfo.CurrentUICulture.Name != "en")
+{
+
+    var normalizedCurrentUICultureName = CultureInfo.CurrentUICulture.Name.Replace("-", "_");
+    var localizationFileNameWithExtension = "messages_";
+    switch (normalizedCurrentUICultureName)
+    {
+        case "zh_Hans":
+            localizationFileNameWithExtension += "zh";
+            break;
+        case "es_MX":
+            localizationFileNameWithExtension += "es";
+            break;
+        default:
+            localizationFileNameWithExtension += normalizedCurrentUICultureName;
+            break;
+    }
+    localizationFileNameWithExtension += ".min.js";
+    <script src="~/libs/jquery-validate/localization/@localizationFileNameWithExtension" asp-append-version="true"></script>
+}
+
+<script type="text/javascript">
+    //Notifications
+
+
+
+
+    $(document).ready(function () {
+
+                var notificationGridDataSource = new DevExpress.data.DataSource({
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                abp.services.app.notification.getUserNotifications({
+                    sorting: loadOptions.sort ? JSON.stringify(loadOptions.sort) : "",       // Pass if sorting is remote
+                    skipCount: loadOptions.skip >= 0 ? loadOptions.skip : 0,     // The number of records to skip
+                    maxResultCount: loadOptions.take > 0 ? loadOptions.take : 10,     // The number of records to take
+                    requireTotalCount: true,   // A flag telling the server whether the total count of records (totalCount) is required
+                }).done(function (result) {
+                    result.data = result.items;
+                    var oldCount = $('#unread-notifications-span').html();
+                    $('#unread-notifications-span').html(parseInt(oldCount - result.items.filter(i => i.state == 0).length));
+                    // You can process the received data here
+                    d.resolve(result, {
+                        //totalCount: result.result.totalCount,
+                    });
+                });
+                return d.promise();
+            },
+        });
+
+        var notificationDataGrid;
+        $('.dropdown-notification a').first().on('mousedown', function () {
+            if (notificationDataGrid == undefined) {
+                notificationDataGrid = $("#notifications-content").dxDataGrid({
+                    showColumnHeaders: false,
+                    paging: {
+                        enabled: true,
+                        pageIndex: 0,
+                        pageSize: 10
+                    },
+                    pager: {
+                        visible: false,
+                    },
+                    dataSource: notificationGridDataSource,
+                    filterRow: {
+                        visible: false,
+                    },
+                    searchPanel: {
+                        visible: false,
+                    },
+                    onCellPrepared: function (e) {
+                        if (e.rowType === "data" && e.data.state == '@((int)Abp.Notifications.UserNotificationState.Unread)') {
+                            e.cellElement.css('background-color', '#E4E5EC');
+                        }
+                    },
+                    scrolling: {
+                       // mode: 'infinite'
+                    },
+                    columns: [
+                        {
+                            dataField: "id",
+                            visible: false,
+                        },
+                        {
+                            dataField: "message",
+                            caption: "@Tokens.Content",
+                            allowFiltering: false,
+                            allowSorting: false,
+                            allowSearch: false,
+                            cellTemplate: function (container, options) {
+                                var date = DevExpress.localization.formatDate(new Date(options.data.creationTime), 'shortDateShortTime');
+                                var small = $('<small>').append($('<time>').addClass('media-meta text-muted').html(date));
+                                var p = $('<p>').addClass('notification-text font-small-3 text-muted').html(options.data.message);
+                                var innerDiv = $('<div>').addClass('media-body').append(p).append(small);
+                                var div = $('<div>').addClass('media').append(innerDiv);
+                                var a = $('<a>').attr('href', "/"+ options.data.redirectUrl).append(div);
+                                container.append(a);
+                            },
+                        },
+                    ],
+                    remoteOperations: true,
+                }).dxDataGrid("instance");
+            }
+        });
+        //override abp.notifications.showUiNotifyForUserNotification function
+        abp.notifications.showUiNotifyForUserNotification = function (userNotification) {
+            var message = abp.notifications.getFormattedMessageFromUserNotification(userNotification);
+            var redirectUrl = userNotification.notification.data.properties['redirectUrl'];
+            displayToast(message, 'info', false, 2000, redirectUrl);
+        }
+
+        //override LocalizableMessageNotificationData formatter
+        abp.notifications.messageFormatters['Abp.Notifications.LocalizableMessageNotificationData'] = function (userNotification) {
+            var localizedText = abp.localization.localize(
+                userNotification.notification.data.message.name,
+                userNotification.notification.data.message.sourceName
+            );
+
+            $.each(userNotification.notification.data.properties, function (key, value) {
+                if (value.Name !== undefined && value.SourceName != undefined) {
+                    localizedText = localizedText.replace('{' + key + '}', abp.localization.localize(
+                        value.Name,
+                        value.SourceName
+                    ));
+                }
+                else
+                    localizedText = localizedText.replace('{' + key + '}', value);
+            });
+            return localizedText;
+        };
+
+
+    });
+    // Notifications
+    abp.event.on('abp.notifications.received', function (userNotification) { // Register for incoming messages
+        var oldCount = $('#unread-notifications-span').html();
+        $('#unread-notifications-span').html(parseInt(oldCount) + 1);
+
+        var oldTotalCount = $('#total-notifications-span').html();
+        $('#total-notifications-span').html(parseInt(oldTotalCount) + 1);
+    });
+        // Localizing momentjs
+    moment.locale('@CultureInfo.CurrentUICulture.Name');
+    $(document).ready(function () {
+    });
+    var l = abp.localization.getSource("CMMS");
+    // Data grid default options
+    var rtl = "@isRTL" == "True";
+    var isEditMode = false;
+    DevExpress.ui.dxDataGrid.defaultOptions({
+        options: {
+            wordWrapEnabled: true,
+            remoteOperations: false,
+            errorRowEnabled: false,
+            rtlEnabled: rtl,
+            noDataText: "@Tokens.NoData",
+            paging: {
+                enabled: true,
+                pageIndex: 0,
+                pageSize: 10
+            },
+            headerFilter: {
+                visible: true,
+                allowSearch: true
+            },
+            filterRow: {
+                visible: true,
+                applyFilter: "auto"
+            },
+            pager: {
+                visible: true,
+                showPageSizeSelector: true,
+                allowedPageSizes: [5, 10, 25, 50],
+                showInfo: true,
+                infoText: ""// @*"@Tokens.Page {0} @Tokens.Of {1} ({2} @Tokens.Items)"*@
+            },
+            searchPanel: {
+                visible: true,
+                highlightCaseSensitive: true,
+                placeholder:"@Tokens.Search"
+            },
+            showBorders: true,
+            columnAutoWidth: true,
+            editing: {
+                useIcons: true,
+                mode: "popup",
+                texts: {
+                    deleteRow:"@Tokens.Delete" ,
+                    editRow: "@Tokens.Edit",
+                    saveRowChanges: "@Tokens.Save",
+                    cancelRowChanges:"@Tokens.Cancel",
+                },
+                popup: {
+                    showTitle: true,
+                    width: 700,
+                    height: 500,
+                    position: {
+                        my: "top",
+                        at: "top",
+                        of: window
+                    },
+                     onContentReady: function (e) {
+                         $("[aria-label=" + "@Tokens.Save" + "]").css({ "background-color": "#5cb85c", "color": "white" });
+                        $("[aria-label=" + "@Tokens.Cancel" + "]").css({ "background-color": "#6c757d", "color": "white" });
+                    }
+                },
+            },
+            onRowUpdating: function (options) {
+                options.newData = $.extend({}, options.oldData, options.newData);
+            },
+            onRowExpanding: function (e) {
+                e.component.collapseAll(-1);
+            },
+            onEditingStart: function (e) {
+                isEditMode = true;
+            },
+            scrolling: {
+                showScrollbar: 'always',
+            }
+        }
+
+
+
+    });
+    // toasts
+    function displayToast(message, type, isDismissible = true, displayTime = 5000, redirectUrl = null) {
+        var closeOnTime = !isDismissible;
+        var insideClicked = false;
+        var options = {
+            rtlEnabled: rtl,
+            message: message,
+            displayTime: displayTime,
+            closeOnClick: true,
+            closeOnOutsideClick: function (e) {
+                if (e.target.classList.contains("dx-toast-content")) {
+                    insideClicked = true;
+                }
+                closeOnTime = false;
+                return true;
+            },
+            onHiding: function (e) {
+                e.cancel = closeOnTime;
+            },
+            onHidden: function (e) {
+                if (redirectUrl != undefined && insideClicked)
+                    window.location.href = abp.appPath + redirectUrl;
+            }
+        };
+        DevExpress.ui.notify(options, type, displayTime);
+    }
+    // confirm delete message
+    function displayCOnfirmDelete(event , message) {
+          var result = DevExpress.ui.dialog.custom({
+                showTitle: false,
+              dragEnabled: false,
+              messageHtml: `<div><h4>${message}</h4></div>`,
+                buttons: [
+                    {
+
+                        text:"@Tokens.Confirm" ,
+                        type: "default",
+                        width: 120,
+                        onClick: function (event) {
+                            return true;
+                        }
+                    },
+                    {
+                        text:"@Tokens.Cancel",
+                        type: "normal",
+                        width: 120,
+                        onClick: function (event) {
+                            return false;
+                        }
+                    }]
+            });
+            event.cancel = $.Deferred(function (deferred) {
+                result.show().done(function (result) {
+                    deferred.resolve(!result);
+            });
+            }).promise();
+    }
+
+    //override abp.ajax.showError function
+    abp.ajax.showError = function (error) {
+        displayToast(error.message, 'error', false, 2000);
+    }
+
+    //filter object
+    function filterObject(obj, value) {
+        let result = {}, key;
+        for (key in obj) {
+            if (obj.hasOwnProperty(key) && obj[key]==value) {
+                result[key] = obj[key];
+            }
+        }
+        return result;
+    }
+                         $("[aria-label=" + "@Tokens.Save" + "]").css({ "background-color": "#5cb85c", "color": "white" });
+                        $("[aria-label=" + "@Tokens.Cancel" + "]").css({ "background-color": "#6c757d", "color": "white" });
+</script>
+
+<!-- Dynamic scripts of ABP system (They are created on runtime and can not be bundled) -->
+<script src="~/AbpServiceProxies/GetAll?v=@(AppTimes.StartupTime.Ticks)" type="text/javascript"></script>
+<script src="~/AbpScripts/GetScripts?v=@(AppTimes.StartupTime.Ticks)" type="text/javascript"></script>
+
+

@@ -1,0 +1,265 @@
+﻿@using Charismatic.Web.Startup
+@{ ViewBag.CurrentPageName = PageNames.CaseTypes; // The menu item will be active for this page. }
+}
+
+<div class="table-header">
+    @*@await Component.InvokeAsync(typeof(ContentHeaderViewComponent), new { PageName = Tokens.Centers })*@
+    <h3 class="text-blue">   @Tokens.CaseTypes</h3>
+</div><!--.table-header-->
+
+<div class="bg-table-grey">
+    <div class="table-responsive">
+        <div id="table"></div>
+    </div>
+</div>
+
+@section styles {
+    <style>
+        .form-container {
+            padding: 20px;
+        }
+
+        .detail-form label {
+            font-weight: bold;
+        }
+    </style>
+}
+
+@section scripts {
+    <script>
+                 // confirm delete message
+    function errorMessage(event , message) {
+          var result = DevExpress.ui.dialog.custom({
+                showTitle: false,
+              dragEnabled: false,
+              messageHtml: `<div><h4>${message}</h4></div>`,
+                buttons: [
+                    {
+                        text:"@Tokens.Ok",
+                        type: "normal",
+                        width: 120,
+                        onClick: function (event) {
+                            return false;
+                        }
+                    }]
+            });
+            event.cancel = $.Deferred(function (deferred) {
+                result.show().done(function (result) {
+                    deferred.resolve(!result);
+            });
+            }).promise();
+    }
+        var gridDataSource = new DevExpress.data.DataSource({
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                abp.services.app.caseTypes.getAllCaseTypes({
+                    filter: loadOptions.filter ? JSON.stringify(loadOptions.filter) : "", // Pass if filtering is remote
+                    sorting: loadOptions.sort ? JSON.stringify(loadOptions.sort) : "",       // Pass if sorting is remote
+                    skipCount: loadOptions.skip >= 0 ? loadOptions.skip : 0,     // The number of records to skip
+                    maxResultCount: loadOptions.take > 0 ? loadOptions.take : 100,     // The number of records to take
+                    requireTotalCount: true,   // A flag telling the server whether the total count of records (totalCount) is required
+
+                }).done(function (result) {
+                    result.data = result.items;
+                    // You can process the received data here
+                    d.resolve(result, {
+                        //totalCount: result.result.totalCount,
+                    });
+                });
+                return d.promise();
+            },
+            insert: function (values) {
+                return abp.services.app.caseTypes.create(values).done(function () {
+                    displayToast('@String.Format(@Messages.ObjectAddedSuccessfully,@Tokens.CaseType)', 'success');
+                    $(".dx-loadpanel-content").hide();
+                });
+            },
+            update: function (key, values) {
+                return abp.services.app.caseTypes.update(values).done(function () {
+
+
+                    displayToast('@String.Format(@Messages.ObjectUpdatedSuccessfully, @Tokens.CaseType)', 'success');
+                    $(".dx-loadpanel-content").hide();
+                      $('#table').dxDataGrid("instance").refresh();
+                });
+            },
+            remove: function (key) {
+                return abp.services.app.caseTypes.delete(key, { async: false }).done(function () {
+                   displayToast( '@String.Format(@Messages.ObjectDeleedSuccessfully,@Tokens.CaseType)' , 'success');
+                    $(".dx-loadpanel-content").hide();
+                    $('#table').dxDataGrid("instance").refresh();
+                });
+            },
+        });
+
+        $(function () {
+            var types;
+            var dataGrid = $("#table").dxDataGrid({
+
+                dataSource: gridDataSource,
+                searchPanel: {
+                    visible: true,
+                    width: 240,
+                },
+                paging: {
+                    pageSize: 6,
+                    pageIndex: 1    // Shows the second page
+                },
+                headerFilter: {
+                    visible: true,
+                    allowSearch: true
+                },
+                filterRow: {
+                    visible: true,
+                    applyFilter: "auto"
+                },
+                sorting: {
+                    mode: "multiple"
+                },
+                columnsAutoWidth: true,
+                pager: {
+                    visible: true,
+                    showPageSizeSelector: true,
+                    allowedPageSizes: [5, 10, 25, 50],
+                    showInfo: true,
+                },
+                editing: {
+                    allowAdding: true,
+                    allowUpdating: true,
+                    allowDeleting: true,
+                    useIcons: true,
+                    texts: {
+                        addRow: "@Tokens.AddCaseType",
+                        confirmDeleteMessage: null,
+                        saveRowChanges: "@Tokens.Save",
+                        cancelRowChanges: "@Tokens.Cancel",
+                    },
+                    mode: "popup",
+                    popup: {
+                        width: 500,
+                        height: 300,
+                        title: "@Tokens.CaseTypeInfo",
+                    },
+
+                    form: {
+                        itemType: "group",
+                        colCount: 1,
+                        colSpan: 2,
+                        items: [
+                            {
+                                dataField: "type",
+                                validationRules: [
+                                    {
+                                        type: "required", message: '@string.Format(DataAnnotations.Required, Tokens.Type)'
+                                    }
+
+                                ]
+                            }]
+                    }
+                },
+
+                onRowRemoving: function (e) {
+                    displayCOnfirmDelete(e, '@String.Format(@Messages.ConfirmDeleteObject,@Tokens.CaseType)');
+
+                },
+
+
+                columns: [
+                    {
+                        dataField: "id",
+                        caption: "@Tokens.Id",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                        allowEditing: false,
+                    },
+                    {
+                        dataField: "type",
+                        caption: "@Tokens.Type",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allTypeowSearch: false,
+                    },
+                    {
+                        dataField: "creationTime",
+                        caption: "@Tokens.CreationDateandTime",
+                        dataType: "datetime",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                        sortIndex: 0,
+                        sortOrder: "desc",
+                    }, {
+                        dataField: "creatorUserName",
+                        caption: "@Tokens.Createdby",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                        allowEditing: false,
+                    },
+                ],
+                masterDetail: {
+                    enabled: true,
+                    template: masterDetailTemplate
+                },
+
+                onRowExpanding: function (e) {
+
+                    e.component.collapseAll(-1);
+                },
+                remoteOperations: true,
+                //onRowUpdating: function (options) {
+                //    debugger;
+                //    options.newDaTypeta = $.extend({}, options.oldData, options.newData);
+                //},
+            }).dxDataGrid("instance");
+        })
+         function masterDetailTemplate(_, masterDetailOptions) {
+
+
+             abp.services.app.caseTypes.get({ id: masterDetailOptions.data.id },
+                {
+                    async: false,
+                }).done(function (result) {
+                    debugger;
+                    detail = result;
+                });
+
+            return $("<div>").dxTabPanel({
+                items: [{
+                    title: "@Tokens.CaseTypeDetails",
+                    template: createPositionTabTemplate(detail)
+                }]
+            });
+        }
+
+        function createPositionTabTemplate(detail) {
+            debugger;
+            return function () {
+
+                return $("<div>").addClass("detail-form form-container").dxForm({
+                    formData: detail,
+                    readOnly: true,
+                    colCount: 2,
+                    items: [{ dataField: "id", label: { text: "@Tokens.Id" } },
+                        { dataField: "type", label: { text: "@Tokens.Type" } },
+
+
+
+
+                    {
+                        dataField: "creationTime", label: { text: "@Tokens.CreationDate" }, editorType: "dxDateBox", editorOptions: {
+                            displayFormat: "MM/dd/yyyy hh:mm a",
+                            width: "100%",
+                        }
+                    },
+                    { dataField: "creatorUserName", label: { text: "@Tokens.Createdby" } },
+
+                    ],
+                });
+            }
+        }
+
+
+    </script>
+}

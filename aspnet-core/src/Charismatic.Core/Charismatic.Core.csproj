@@ -1,0 +1,77 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <VersionPrefix>1.0.0.0</VersionPrefix>
+    <TargetFramework>net5.0</TargetFramework>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <AssemblyName>Charismatic.Core</AssemblyName>
+    <PackageId>Charismatic.Core</PackageId>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <UserSecretsId>AbpCompanyName-Charismatic-56C2EF2F-ABD6-4EFC-AAF2-2E81C34E8FB1</UserSecretsId>
+    <RootNamespace>Charismatic</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\SourceFiles\*.xml" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Domain\Enums\**" />
+    <EmbeddedResource Remove="Domain\Enums\**" />
+    <None Remove="Domain\Enums\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Abp.AutoMapper" Version="6.5.0" />
+    <PackageReference Include="Abp.ZeroCore.EntityFrameworkCore" Version="6.5.0" />
+    <PackageReference Include="Castle.Windsor.MsDependencyInjection" Version="3.4.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="5.0.10" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Domain\Address\Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Localization\SourceFiles\DataAnnotations.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DataAnnotations.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Localization\SourceFiles\Exceptions.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Exceptions.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Localization\SourceFiles\Messages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Messages.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Localization\SourceFiles\Tokens.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Tokens.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Localization\SourceFiles\DataAnnotations.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>DataAnnotations.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\SourceFiles\Exceptions.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Exceptions.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\SourceFiles\Messages.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\SourceFiles\Tokens.ar-EG.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\SourceFiles\Tokens.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Tokens.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

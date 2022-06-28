@@ -1,0 +1,51 @@
+﻿@model Charismatic.Web.Models.Centers.CreateCenterViewModel
+
+<div class="modal" tabindex="-1" id="createCenterModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-blue">@Tokens.CenterInfo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="centerInfo" class="form-vertical" method="post" asp-action="Create">
+                    <div class="form-group text-left">
+                        <label class="text-blue" asp-for="Name">@Tokens.Name</label>
+                        <input class="form-control" asp-for="Name" aria-describedby="Name" placeholder="@Tokens.Name" />
+                    </div>
+                    <div class="form-group text-left">
+                        <label class="text-blue" asp-for="CountryId">@Tokens.Country</label>
+                        <select asp-for="CountryId" asp-items="Model.Countries" class="form-control" onchange="getStates()">
+                            <option selected="selected" value="">@Tokens.Country</option>
+                        </select>
+                    </div>
+                    <div class="form-group text-left">
+                        <label class="text-blue" asp-for="StateId">@Tokens.City</label>
+                        <select asp-for="StateId" class="form-control">
+                            <option selected="selected" value="">@Tokens.City</option>
+                        </select>
+                    </div>
+                    <div class="form-group text-left">
+                        <label class="text-blue" asp-for="Street">@Tokens.Street</label>
+                        <input type="text" class="form-control" placeholder="@Tokens.Street" name="Street" value="@Model.Street" />
+                    </div>
+                    <div class="form-group text-left">
+                        <label class="text-blue" asp-for="Building">@Tokens.Building</label>
+                        <input type="text" class="form-control" placeholder="@Tokens.Building" name="Building" value="@Model.Building" />
+                    </div>
+                    <div class="form-group text-left">
+                        <label class="text-blue" asp-for="AccountEmail">@Tokens.AccountEmail</label>
+                        <input asp-for="AccountEmail" class="form-control" placeholder="@Tokens.AccountEmail" />
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-custom bg-light" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-custom bg-cyan" onclick="handleModalFormSubmit()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>

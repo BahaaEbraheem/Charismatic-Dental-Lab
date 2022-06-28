@@ -1,0 +1,73 @@
+﻿@using Abp.Authorization.Users
+@model Charismatic.Web.Models.Account.LoginFormViewModel
+@{
+    ViewBag.Title = L("LogIn");
+}
+
+<!-- Start Login Page -->
+
+<div class="row">
+    <div class="col-12 col-md-6 pr-0">
+        <div class="login-content bg-white pt-5">
+            <div class="col-8 text-center mx-auto">
+                <h6 class="text-uppercase">welcome to</h6>
+                <h5 class="text-uppercase">CHARISMATICAL.<span>DL</span></h5>
+                <p class="my-3">Log in to get the moment updates on the things that interest you.</p>
+                <form class="mb-3" id="LoginForm" asp-action="Login" method="post">
+                    <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+                    <input type="hidden" name="returnUrlHash" />
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">
+                                <i class="fa fa-user" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                        <input type="text" class="form-control custom-input" name="usernameOrEmailAddress" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon2">
+                                <i class="fa fa-lock" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                        <input type="password" class="form-control" name="Password" autocomplete="password" placeholder="@L("Password")" required maxlength="@AbpUserBase.MaxPlainPasswordLength">
+                    </div>
+                    <input type="submit" id="LoginButton" class="btn btn-block btn-custom text-uppercase" value="@L("LogIn")">
+                </form>
+                <p>Don't have any account ? <a href="/Account/Register" class="">Sign Up Now</a></p>
+                <div class="line">
+                    <span class="side-line"></span>
+                    <span class="content-line">Or</span>
+                    <span class="side-line"></span>
+                </div>
+                <div class="social-media mt-4">
+                    <p class="mb-2">Continue with social media</p>
+                    <ul class="list-unstyled d-flex justify-content-center">
+                        <li><a href="#" class=""><i class="fa fa-instagram fa-fw" aria-hidden="true"></i></a></li>
+                        <li><a href="#" class=""><i class="fa fa-whatsapp fa-fw" aria-hidden="true"></i></a></li>
+                        <li><a href="#" class=""><i class="fa fa-facebook fa-fw" aria-hidden="true"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-none d-md-block col-md-6 pl-0">
+        <img src="~/img/login-image.jpg" class="img-responsive" alt="Login Image">
+    </div>
+</div>
+
+
+@section scripts
+{
+    <!-- Login scripts start -->
+    <environment names="Development">
+        <script src="~/view-resources/Views/Account/Login.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Views/Account/Login.min.js" asp-append-version="true"></script>
+    </environment>
+
+    <!-- Login scripts end -->
+}
+<!-- End Login Page -->

@@ -1,0 +1,491 @@
+﻿@using Charismatic.Web.Startup
+@{ ViewBag.CurrentPageName = PageNames.Users; // The menu item will be active for this page. }
+}
+@*@await Component.InvokeAsync(typeof(ContentHeaderViewComponent), new { PageName = Tokens.Centers })*@
+<div class="table-header">
+    <h3 class="text-blue">@Tokens.Users </h3>
+</div><!--.table-header-->
+
+<div class="bg-table-grey">
+
+    <div class="col-md-12 table-responsive" style="background-color: white; padding: 10px 20px 10px 20px" ;>
+        <div id="table">
+
+        </div>
+    </div>
+</div>
+@section styles {
+    <style>
+        .form-container {
+            padding: 20px;
+        }
+
+        .detail-form label {
+            font-weight: bold;
+        }
+    </style>
+}
+
+
+
+@section scripts {
+
+    <script>
+        var startDate;
+        var editors = {};
+        var gridDataSource = new DevExpress.data.DataSource({
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                abp.services.app.user.getAll({
+                    filter: loadOptions.filter ? JSON.stringify(loadOptions.filter) : "", // Pass if filtering is remote
+                    sorting: loadOptions.sort ? JSON.stringify(loadOptions.sort) : "",       // Pass if sorting is remote
+                    skipCount: loadOptions.skip >= 0 ? loadOptions.skip : 0,     // The number of records to skip
+                    maxResultCount: loadOptions.take > 0 ? loadOptions.take : 100,     // The number of records to take
+                    requireTotalCount: true,   // A flag telling the server whether the total count of records (totalCount) is required
+
+                }).done(function (result) {
+                    result.data = result.items;
+                    // You can process the received data here
+                    d.resolve(result, {
+                        //totalCount: result.totalCount,
+                    });
+                });
+                return d.promise();
+            },
+
+        });
+        $(function () {
+
+
+            var dataGrid = $("#table").dxDataGrid({
+
+                dataSource: gridDataSource,
+                filterRow: {
+                    visible: true,
+                },
+                editing: {
+                    allowAdding: false,
+                    allowDeleting: false,
+                    popup: {
+                        height: 250,
+                        width: 600,
+                        title: "@Tokens.AssignRole",
+                    },
+                    texts: {
+                        addRow: "@Tokens.AssignRole",
+                        confirmDeleteMessage: null
+                    },
+                },
+                columns: [
+                    {
+                        dataField: "id",
+                        caption: "@Tokens.Id",
+                        alignment: rtl ? "right" : "left",
+                        allowFiltering: false,
+                        allowSorting: true,
+                        allowSearch: true,
+                        allowEditing: false,
+                    },
+                    {
+                        dataField: "userName",
+                        caption: "@Tokens.UserName",
+                        allowFiltering: false,
+                        allowSorting: true,
+                        allowSearch: true,
+                        allowEditing: false,
+                    },
+                    {
+                        dataField: "name",
+                        caption: "@Tokens.Name",
+                        alignment: rtl ? "right" : "left",
+                        allowFiltering: false,
+                        allowSorting: true,
+                        allowSearch: true,
+                        allowEditing: false,
+                    },
+
+                    {
+                        dataField: "emailAddress",
+                        caption: "@Tokens.EmailAddress",
+                        allowFiltering: false,
+                        allowSorting: true,
+                        allowSearch: true,
+                        allowEditing: false,
+                    },
+
+
+
+                    {
+                        dataField: "isActive",
+                        caption: "@Tokens.Status",
+                        allowFiltering: true,
+                        allowSorting: false,
+                        allowSearch: false,
+                        lookup: {
+                            valueExpr: "id",
+                            displayExpr: "name",
+                            dataSource: [{ name: "@Tokens.Active", id: true }, { name: "@Tokens.InActive", id: false }]
+                        }
+                    },
+
+                    {
+                        dataField: "creationTime",
+                        caption: "@Tokens.CreationDateandTime",
+                        dataType: "datetime",
+                        allowFiltering: false,
+                        allowEditing: false,
+                        allowSearch: false,
+                        allowSorting: true,
+                        sortIndex: 0,
+                        sortOrder: "desc",
+                    },
+                    {
+                        dataField: "lastLoginDate",
+                        caption: "@Tokens.LastLoginDateAndTime",
+                        dataType: "datetime",
+                        allowFiltering: false,
+                        allowEditing: false,
+                        allowSearch: false,
+                        allowSorting: true,
+                        sortIndex: 0,
+                        sortOrder: "desc",
+                    },
+                    @*{
+                        dataField: "type",
+                        caption: "@Tokens.UserTypes",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                        lookup: {
+                            valueExpr: "text",
+                            displayExpr: "text",
+                            dataSource:usertypes
+                        },
+                        cellTemplate: function (container, options) {
+                            var noBreakSpace = "\u00A0",
+                                text = (options.value || []).map(function (element) {
+                                    return options.column.lookup.calculateCellValue(element);
+                                }).join(", ");
+                            container.text(text || noBreakSpace).attr("title", text);
+                        },
+                    },*@
+
+                ],
+                masterDetail:
+                         {
+                enabled: true,
+                template: masterDetailTemplate,
+            },
+                onRowClick: function (e) {
+                    var key = e.component.getKeyByRowIndex(e.rowIndex);
+                    var expanded = e.component.isRowExpanded(key);
+                    if (expanded) {
+                    }
+                    else {
+                        $("#table").dxDataGrid("instance").refresh();
+                    }
+                },
+
+                remoteOperations: true,
+            }).dxDataGrid("instance");
+
+
+            var userId;
+            function masterDetailTemplate(_, masterDetailOptions) {
+                var detail;
+                userId = masterDetailOptions.data.id;
+                oraclePosition =  masterDetailOptions.data.oraclePositions;
+                abp.services.app.user.getUserDetails(masterDetailOptions.data.id,
+                    {
+                        async: false,
+                    }).done(function (result) {
+                        detail = result;
+
+                    });
+
+
+                return $("<div>").dxTabPanel({
+                    items: [
+                        {
+                            title: "@Tokens.UserDetails",
+                            template: createDetailsTabTemplate(detail)
+                        },
+                       {
+                            visible: true,
+                            title: "@Tokens.Roles",
+                            template: createRolesTabTemplate(detail.roles)
+                        },
+
+                    ]
+                });
+            }
+
+            function createDetailsTabTemplate(detail) {
+                return function () {
+                    return $("<div>").addClass("detail-form form-container").dxForm({
+                        formData: detail,
+                        colCount: 2,
+                        readOnly: true,
+                        items: [
+                            {
+                                dataField: "id",
+                                label: { text: "@Tokens.Id" },
+                            }, {
+                                dataField: "userName",
+                                label: { text: "@Tokens.UserName" },
+                            },
+                            {
+                                dataField: "name",
+                                label: { text: "@Tokens.Name" },
+                            },
+                            {
+                                dataField: "emailAddress",
+                                label: { text: "@Tokens.EmailAddress" },
+                            },
+                            {
+                                dataField: "creationTime",
+                                label: { text: "@Tokens.CreationDate" },
+                                editorType: "dxDateBox",
+                                editorOptions: {
+                                    width: "100%",
+                                    displayFormat: "MM/dd/yyyy hh:mm a",
+                                }
+                            },
+                            {
+                                dataField: "lastLoginDate",
+                                label: { text: "@Tokens.LastLoginDateAndTime" },
+                                editorType: "dxDateBox",
+                                editorOptions: {
+                                    width: "100%",
+                                    displayFormat: "MM/dd/yyyy hh:mm a",
+                                }
+                            },
+                        ]
+                    });
+                }
+            }
+
+            //Role template
+            function createRolesTabTemplate(list) {
+                var roles;
+                abp.services.app.role.getAllRoles({isActive : true}, {
+                    async: false,
+                }).done(function (result) {
+                    roles = result.items;
+                });
+
+                for (var i = 0; i < list.length; i++) {
+                    if (list[i].roleId != null)
+                        roles = roles.filter(obj => obj.id != list[i].roleId);
+                }
+                var typeDataSource = new DevExpress.data.DataSource({
+                    key: "id",
+                    load: function () {
+                        return list;
+                    },
+                    insert: function (values) {
+
+                        return abp.services.app.user.assignRoleToUser(values).done(function (result) {
+                            displayToast("@string.Format(Messages.ObjectAssignedSuccessfully, Tokens.Role)", 'success');
+                            $(".dx-loadpanel-content").hide();
+                            list.unshift(result);
+                            roles = roles.filter(obj => obj.id != values.roleId);
+                        });
+                    },
+                    remove: function (values) {
+                        return abp.services.app.user.unAssignRoleToUser(values).done(function (result) {
+                            displayToast("@string.Format(Messages.ObjectUnassignedSuccessfully, Tokens.Role)", 'success');
+                            $(".dx-loadpanel-content").hide();
+                            role = list.filter(obj => obj.id == values);
+                            list = list.filter(obj => obj.id != values);
+                            roles.unshift({name :role[0].roleName , id : role[0].roleId });
+                        });
+                    },
+                });
+                return function () {
+                    return $("<div>").addClass("form-container").dxDataGrid({
+                        dataSource: typeDataSource,
+                        filterRow: {
+                            visible: false,
+                        },
+                        paging: {
+                            pageSize: 20
+                        },
+                        pager: {
+                            showPageSizeSelector: false,
+                            showInfo: true
+                        },
+                        editing: {
+                            allowAdding: true,// abp.auth.isGranted(_Unassign_Role"),
+                            allowDeleting: true,///abp.auth.isGranted("ns_Assign_Unassign_Role"),
+                            popup: {
+                                height: 250,
+                                width: 600,
+                                title: "@Tokens.AssignRole",
+                            },
+                            texts: {
+                                addRow: "@Tokens.AssignRole",
+                                confirmDeleteMessage: null
+                            },
+                            form: {
+                                itemType: "group",
+                                colCount: 1,
+                                colSpan: 2,
+                                items: [
+                                    {
+                                        dataField: "roleId",
+                                        editorOptions: {
+                                            placeholder: "@Tokens.Select",
+
+                                        },
+                                        validationRules: [
+                                            {
+                                                type: "required", message: '@string.Format(DataAnnotations.Required, Tokens.RoleName)'
+                                            }],
+                                    }]
+                            }
+                        },
+                        onRowInserting: function (values) {
+                            values.data.userId = userId;
+                        },
+
+                        onRowRemoving: function (e) {
+                            alert(1)
+                            displayCOnfirmDelete(e, "@string.Format(Messages.ConfirmUnassignedObject , Tokens.Role)");
+
+                        },
+                        columns: [
+
+                            {
+                                dataField: "roleName",
+                                caption: "@Tokens.RoleName",
+                                allowFiltering: false,
+                                allowSorting: false,
+                                allowSearch: true,
+                            },
+                            {
+                                dataField: "creationTime",
+                                caption: "@Tokens.AssignedDateAndTime",
+                                dataType: "datetime",
+                                allowFiltering: false,
+                                allowSearch: false,
+                                sortIndex: 0,
+                                sortOrder: "desc",
+                            },
+                            {
+                                dataField: "createrUserName",
+                                caption: "@Tokens.AssignedBy",
+                                allowFiltering: false,
+                                allowSorting: false,
+                                allowSearch: true,
+                            },
+                            //form data
+                            {
+                                dataField: "roleId",
+                                caption: "@Tokens.RoleName",
+                                visible: false,
+                                lookup: {
+                                    dataSource: function (options) {
+                                        return {
+                                            store: roles,
+                                        };
+                                    },
+                                    displayExpr: "name",
+                                    valueExpr: "id"
+                                },
+                            },
+
+                        ],
+                        masterDetail:
+                        {
+                            enabled: true,
+                            template: masterRoleDetailTemplate,
+                        },
+                    });
+                }
+
+            }
+
+            function masterRoleDetailTemplate(_, masterDetailOptions) {
+                var roleDetail
+                abp.services.app.role.get({ id: masterDetailOptions.data.roleId },
+                    {
+                        async: false,
+                    }).done(function (result) {
+                        roleDetail = result;
+                    });
+                return $("<div>").dxTabPanel({
+                    items: [{
+                        title: "@Tokens.RoleDetails",
+                        template: createRoleDetailTabTemplate(roleDetail)
+
+                    }]
+                });
+            }
+
+            function createRoleDetailTabTemplate(data) {
+                return function () {
+                    return $("<div>").addClass("form-container").dxForm({
+
+                        formData: data,
+                        colCount: 2,
+                        readOnly: true,
+                        items: [
+                            {
+                                dataField: "id",
+                                label: { text: "@Tokens.Id" },
+                            }, {
+                                dataField: "name",
+                                label: { text: "@Tokens.Name" }
+                            }, {
+                                dataField: "creationTime",
+                                label: { text: "@Tokens.CreationDate" },
+                                editorType: "dxDateBox",
+                                dataType: "datetime",
+                                editorOptions: {
+                                    width: "100%",
+                                    displayFormat: "MM/dd/yyyy, hh:mm a",
+                                }
+                            },
+
+                            {
+                                dataField: "creatorUserName",
+                                label: { text: "@Tokens.Createdby" }
+                            },
+                            @*{
+                                dataField: "usersCount",
+                                editorType: "dxNumberBox",
+                                label: { text: "@Tokens.RelatedUsersCount" }
+                            },*@
+                            {
+                                dataField: "grantedPermissions",
+                                editorType: "dxTagBox",
+                                label: {
+                                    text: "@Tokens.GrantedPermissions"
+                                },
+                            },
+                        ],
+                    });
+                }
+            }
+
+
+            // end template roel
+
+
+        })
+        function ValidateDate(e) {
+            if (e.value < startDate)
+                return false
+            else
+                return true
+        }
+
+    </script>
+
+}
+
+
+
+
+

@@ -1,0 +1,23 @@
+﻿@using Abp.Collections.Extensions
+@using Charismatic.Web.Views
+@using Charismatic.Web.Views.Shared.Components.ContentHeader
+@model ContentHeaderViewModel
+
+
+<div class="content-header ">
+    <div class="content-header-left col-md-12 col-12">
+        <h3 class="content-header-title" style="font-family: unset;">@Model.PageName</h3>
+        <div class="row breadcrumbs-top">
+            <div class="breadcrumb-wrapper col-12">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="~/">@Tokens.HomePage</a>
+                    </li>
+                    <li class="breadcrumb-item active">
+                        @Model.PageName
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>

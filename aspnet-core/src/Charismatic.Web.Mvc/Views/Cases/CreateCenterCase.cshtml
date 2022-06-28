@@ -1,0 +1,158 @@
+﻿@using Charismatic.Web.Startup
+@using static Charismatic.Enums
+@model Charismatic.Web.Models.Cases.CreateCenterCaseViewModel
+@{
+    ViewData["Title"] = "CreateCenterCase";
+    ViewBag.CurrentPageName = PageNames.Cases;
+}
+
+@section styles{
+
+}
+<!-- Modal placeholder -->
+<div id="modal-placeholder"></div>
+
+
+<h1 class="text-gray page-title">@Tokens.CreateCenterCase</h1>
+
+
+<div class="container">
+
+    @await Component.InvokeAsync("CaseCreationWizard", CaseCreationStep.PatientInfo)
+
+    <form id="paitentInfo" class="form-vertical" method="post" asp-action="CreateCenterCase">
+        <div class="bg-grey-form">
+
+            <div class="form-group text-left">
+                <label class="text-cyan" asp-for="FirstName">@Tokens.FirstName</label>
+                <input type="text" class="form-control"
+                       aria-describedby="firstName" placeholder="@Tokens.FirstName" asp-for="FirstName" />
+
+            </div>
+            <div class="form-group text-left">
+                <label class="text-cyan" asp-for="LastName">@Tokens.LastName</label>
+                <input type="text" class="form-control"
+                       aria-describedby="lastName" placeholder="@Tokens.LastName" asp-for="LastName" />
+            </div>
+            <div class="form-group text-left">
+                <label class="text-cyan" asp-for="BirthDate">@Tokens.BirthDate</label>
+                <input type="text" id="BirthDate" name="BirthDate" class="form-control" placeholder="@Tokens.BirthDate" required />
+            </div>
+
+            <div class="form-group text-left">
+                <label class="text-cyan">@Tokens.Gender</label>
+                <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()" class="form-control">
+                    <option selected="selected" value="">@Tokens.Please_select</option>
+                </select>
+            </div>
+
+            <div class="form-group text-left">
+                <label class="text-cyan">@Tokens.Center</label>
+                <select id="" class="form-control" name="CenterName">
+                    @if (@Model.Centers.Any())
+                    {
+                        @*foreach (var s in Model.Centers)
+                        {
+                            <option value="@s.Value" label="@s.Text" selected="@(s.Value == Model.CenterId.ToString()? "selected":"")">
+                                @s.Text
+                            </option>
+                        }*@
+                    }
+
+                </select>
+
+            </div>
+
+        </div>
+
+        <!-- Wizard controls start-->
+        <div class="container row text-center">
+            <div class="col-4 text-left"></div>
+            <div class="col-4"></div>
+            <div class="col-4 text-right">
+                <button type="button" class="btn btn-custom bg-cyan" data-toggle="ajax-modal" data-target="#createCenterModal" data-url='@Url.Action("Create","Centers")'>
+                    @Tokens.AddCenter
+                </button>
+                <button type="submit" class="btn btn-custom bg-cyan">@Tokens.Next</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+
+@section scripts {
+    <script src="~/libs/intl-tel-input/js/intlTelInput.min.js"></script>
+    <script src="~/libs/intl-tel-input/js/utils.min.js"></script>
+    <script src="~/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#BirthDate').datepicker({
+                autoclose: true
+            });
+        });
+        function getIp(callback) {
+            fetch('https://ipinfo.io/json?token=69b14fdf24485d', { headers: { 'Accept': 'application/json' } })
+                .then((resp) => resp.json())
+                .catch(() => {
+                    return {
+                        country: 'ae',
+                    };
+                })
+                .then((resp) => callback(resp.country));
+        }
+
+        const phoneInputField = document.querySelector("#phone");
+        const phoneInput = window.intlTelInput(phoneInputField, {
+            separateDialCode: true,
+            utilsScript: "~/libs/intl-tel-input/js/utils.min.js",
+            initialCountry: "auto",
+            geoIpLookup: getIp
+        });
+
+        function getStates() {
+            countryId = $('#CountryId').val();
+            if (countryId !== '') {
+                $('#StateId').attr('disabled', true);
+                $('#StateId').empty();
+                $('#StateId').append($("<option />").text('@Tokens.GettingCities'));
+                abp.services.app.states.getAll({ countryId: countryId }).done(function (data) {
+                    var $dropdown = $("#StateId");
+                    $dropdown.empty();
+                    $dropdown.append($("<option />").text('@Tokens.City'));
+                    $.each(data.items, function () {
+                        $dropdown.append($("<option />").val(this.id).text(this.name));
+                    });
+                    $('#StateId').attr('disabled', false);
+                });
+            }
+            else {
+                 $('#StateId').empty();
+                 $('#StateId').append($("<option />").text('@Tokens.City'));
+            }
+        }
+        function handleModalFormSubmit() {
+            console.log("modal saved");
+            var form = $('#centerInfo');
+            form.find('input:first').focus();
+            form.validate();
+            if (!form.valid()) {
+                return;
+            }
+            var input = form.serializeFormToObject();
+            var actionUrl = form.attr('action');
+            $.post(actionUrl, input).done(function (data) {
+                $('#modal-placeholder').find('.modal').modal('hide');
+                displayToast('@String.Format(@Messages.ObjectAddedSuccessfully,@Tokens.Center)', 'success');
+                $('#CenterId').append(`<option value="${data.result.id}">
+                                       ${data.result.name}
+                                  </option>`);
+                $("#CenterId").val(data.result.id).change();
+            }).fail(function () {
+                $('#modal-placeholder').find('.modal').modal('hide');
+                displayToast('@String.Format(@Exceptions.CreationFailed, @Tokens.Center)', 'danger');
+            });
+        }
+        
+    </script>
+}

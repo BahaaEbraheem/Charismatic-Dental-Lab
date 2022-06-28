@@ -1,0 +1,187 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "jquery@3.4.1",
+      "destination": "wwwroot/libs/jquery",
+      "files": [
+        "jquery.js",
+        "jquery.min.js",
+        "jquery.min.map"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "abp-web-resources@4.1.0",
+      "destination": "wwwroot/libs/abp-web-resources"
+    },
+    {
+      "library": "jquery.blockUI@2.70",
+      "destination": "wwwroot/libs/block-ui"
+    },
+    {
+      "library": "sweetalert@2.1.2",
+      "destination": "wwwroot/libs/sweetalert"
+    },
+    {
+      "library": "spin.js@2.3.2",
+      "destination": "wwwroot/libs/spin"
+    },
+    {
+      "library": "toastr.js@2.1.4",
+      "destination": "wwwroot/libs/toastr"
+    },
+    {
+      "library": "moment.js@2.24.0",
+      "destination": "wwwroot/libs/moment"
+    },
+    {
+      "library": "moment-timezone@0.5.23",
+      "destination": "wwwroot/libs/moment-timezone"
+    },
+    {
+      "library": "signalr.js@2.4.0",
+      "destination": "wwwroot/libs/signalr"
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "@aspnet/signalr@1.0.0",
+      "destination": "wwwroot/libs/signalr",
+      "files": [
+        "dist/browser/signalr.js",
+        "dist/browser/signalr.js.map"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "admin-lte@3.1.0",
+      "destination": "wwwroot/libs/admin-lte",
+      "files": [
+        "dist/js/adminlte.js",
+        "dist/js/adminlte.js.map",
+        "dist/js/adminlte.min.js",
+        "dist/js/adminlte.min.js.map",
+        "dist/css/adminlte.css",
+        "dist/css/adminlte.css.map",
+        "dist/css/adminlte.min.css",
+        "dist/css/adminlte.min.css.map",
+        "dist/img/avatar5.png"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "bootstrap@4.6.0",
+      "destination": "wwwroot/libs/bootstrap",
+      "files": [
+        "dist/js/bootstrap.bundle.js",
+        "dist/js/bootstrap.bundle.min.js",
+        "dist/js/bootstrap.bundle.js.map",
+        "dist/js/bootstrap.bundle.min.js.map"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "@fortawesome/fontawesome-free@5.15.3",
+      "destination": "wwwroot/libs/font-awesome"
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "icheck-bootstrap@3.0.1",
+      "destination": "wwwroot/libs/icheck-bootstrap",
+      "files": [
+        "icheck-bootstrap.css",
+        "icheck-bootstrap.min.css"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "datatables.net@1.10.24",
+      "destination": "wwwroot/libs/datatables",
+      "files": [
+        "js/jquery.dataTables.js",
+        "js/jquery.dataTables.min.js"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "datatables.net-bs4@1.10.24",
+      "destination": "wwwroot/libs/datatables",
+      "files": [
+        "css/dataTables.bootstrap4.css",
+        "css/dataTables.bootstrap4.min.css",
+        "js/dataTables.bootstrap4.js",
+        "js/dataTables.bootstrap4.min.js"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "datatables.net-responsive@2.2.7",
+      "destination": "wwwroot/libs/datatables",
+      "files": [
+        "js/dataTables.responsive.js",
+        "js/dataTables.responsive.min.js"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "datatables.net-responsive-bs4@2.2.7",
+      "destination": "wwwroot/libs/datatables",
+      "files": [
+        "css/responsive.bootstrap4.css",
+        "css/responsive.bootstrap4.min.css",
+        "js/responsive.bootstrap4.js",
+        "js/responsive.bootstrap4.min.js"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "datatables.net-buttons@1.7.0",
+      "destination": "wwwroot/libs/datatables",
+      "files": [
+        "js/dataTables.buttons.js",
+        "js/dataTables.buttons.min.js"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "datatables.net-buttons-bs4@1.7.0",
+      "destination": "wwwroot/libs/datatables",
+      "files": [
+        "css/buttons.bootstrap4.css",
+        "css/buttons.bootstrap4.min.css",
+        "js/buttons.bootstrap4.js",
+        "js/buttons.bootstrap4.min.js"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "chart.js@2.9.4",
+      "destination": "wwwroot/libs/chartjs",
+      "files": [
+        "dist/Chart.css",
+        "dist/Chart.js"
+      ]
+    },
+    {
+      "library": "jquery-validate@1.19.1",
+      "destination": "wwwroot/libs/jquery-validate"
+    },
+    {
+      "library": "jquery-validation-unobtrusive@3.2.11",
+      "destination": "wwwroot/libs/jquery-validate"
+    },
+    {
+      "library": "push.js@1.0.9",
+      "destination": "wwwroot/libs/push.js"
+    },
+    {
+      "library": "intl-tel-input@17.0.15",
+      "destination": "wwwroot/libs/intl-tel-input/"
+    },
+    {
+      "library": "bootstrap-datepicker@1.9.0",
+      "destination": "wwwroot/libs/bootstrap-datepicker/"
+    }
+  ]
+}

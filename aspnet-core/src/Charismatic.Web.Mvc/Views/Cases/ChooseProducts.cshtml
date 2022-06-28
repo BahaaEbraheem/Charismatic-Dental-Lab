@@ -1,0 +1,22 @@
+﻿@using Charismatic.Web.Startup
+@using static Charismatic.Enums
+@model Charismatic.Web.Models.Cases.ChooseProductViewModel
+@{
+    ViewData["Title"] = "Choose Products";
+    ViewBag.CurrentPageName = PageNames.Cases;
+}
+<h1 class="text-gray page-title">@Tokens.ChooseProducts</h1>
+
+<div class="container">
+    @await Component.InvokeAsync("CaseCreationWizard", CaseCreationStep.Products)
+</div>
+<section class="body-grey-page products">
+    <div class="container">
+        <div class="row">
+            @foreach(var product in Model.Products)
+            {
+                <Product name="@product.Name" image="@product.Image" price="@product.Price"></Product>
+            }            
+        </div>
+    </div>
+</section>

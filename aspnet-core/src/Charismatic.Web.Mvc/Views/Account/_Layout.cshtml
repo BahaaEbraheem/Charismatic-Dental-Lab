@@ -1,0 +1,39 @@
+﻿
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="~/css/devextreme/css/dx.common.css" rel="stylesheet" />
+    <link href="~/css/devextreme/css/dx.light.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/css/login.css">
+</head>
+
+<body>
+    <div class="login-page">
+        <div class="container h-100">
+            <div class="login-box">
+                @RenderBody()
+
+            </div>
+        </div>
+    </div>
+    @await Html.PartialAsync("_Scripts.cshtml")
+    @RenderSection("scripts", required: false)
+
+    <script src="~/view-resources/Views/Account/Login.js" asp-append-version="true"></script>
+    <script src="~/js/jquery-3.4.1.min.js"></script>
+
+    <script src="~/js/popper.min.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+    <script src="~/js/devextreme/js/jszip.min.js" asp-append-version="true"></script>
+    <script src="~/js/devextreme/js/dx.all.debug.js" asp-append-version="true"></script>
+    <script src="~/js/devextreme/js/FileSaver.min.js" asp-append-version="true"></script>
+    <script src="~/js/devextreme/js/exceljs.min.js" asp-append-version="true"></script>
+    <script src="~/js/devextreme/js/dx.aspnet.data.js" asp-append-version="true"></script>
+</body>
+
+</html>

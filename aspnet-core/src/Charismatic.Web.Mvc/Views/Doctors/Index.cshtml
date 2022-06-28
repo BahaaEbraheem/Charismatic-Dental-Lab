@@ -1,0 +1,537 @@
+﻿@using Charismatic.Web.Startup
+@{
+    ViewBag.CurrentPageName = PageNames.Doctors; // The menu item will be active for this page. }
+}
+@*@await Component.InvokeAsync(typeof(ContentHeaderViewComponent), new { PageName = Tokens.Doctors })
+    <div class="content-body">
+        <div class="col-md-12" style="background-color: white; padding: 10px 20px 10px 20px" ;>
+            <div id="table">
+
+            </div>
+        </div>
+    </div>*@
+<div class="table-header">
+    <h3 class="text-blue">@Tokens.Doctors </h3>
+</div><!--.table-header-->
+
+<div class="bg-table-grey">
+
+    <div class="col-md-12 table-responsive" style="background-color: white; padding: 10px 20px 10px 20px" ;>
+        <div id="table">
+
+        </div>
+    </div>
+</div>
+@section styles {
+    <style>
+        .form-container {
+            padding: 20px;
+        }
+
+        .detail-form label {
+            font-weight: bold;
+        }
+    </style>
+}
+@section scripts {
+    <script>
+                 // confirm delete message
+        var isEditable = false;
+     
+    function errorMessage(event , message) {
+          var result = DevExpress.ui.dialog.custom({
+                showTitle: false,
+              dragEnabled: false,
+              messageHtml: `<div><h4>${message}</h4></div>`,
+                buttons: [
+                    {
+                        text:"@Tokens.Ok",
+                        type: "normal",
+                        width: 120,
+                        onClick: function (event) {
+                            return false;
+                        }
+                    }]
+            });
+            event.cancel = $.Deferred(function (deferred) {
+                result.show().done(function (result) {
+                    deferred.resolve(!result);
+            });
+            }).promise();
+    }
+        @*var reasonType;
+        abp.services.app.enumHelper.getEnumAsList("@typeof(ITLand.CMMS.ReasonTypes)", {
+            async: false,
+        }).done(function (result) {
+            reasonType = result;
+        });*@
+        var isActive;
+        var gridDataSource = new DevExpress.data.DataSource({
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                abp.services.app.doctor.getAllDoctors({
+                    filter: loadOptions.filter ? JSON.stringify(loadOptions.filter) : "", // Pass if filtering is remote
+                    sorting: loadOptions.sort ? JSON.stringify(loadOptions.sort) : "",       // Pass if sorting is remote
+                    skipCount: loadOptions.skip >= 0 ? loadOptions.skip : 0,     // The number of records to skip
+                    maxResultCount: loadOptions.take > 0 ? loadOptions.take : 100,     // The number of records to take
+                    requireTotalCount: true,   // A flag telling the server whether the total count of records (totalCount) is required
+
+                }).done(function (result) {
+                    debugger;
+
+                    result.data = result.items;
+
+
+                    // You can process the received data here
+                    d.resolve(result, {
+                        //totalCount: result.result.totalCount,
+                    });
+                });
+                return d.promise();
+            },
+            insert: function (values) {
+               // debugger;
+                return abp.services.app.doctor.create(values).done(function () {
+                    displayToast('@String.Format(@Messages.ObjectAddedSuccessfully,@Tokens.Doctor)', 'success');
+                    $(".dx-loadpanel-content").hide();
+                });
+            },
+            update: function (key, values) {
+              //  debugger;
+                return abp.services.app.doctor.update(values).done(function () {
+
+
+                    displayToast('@String.Format(@Messages.ObjectUpdatedSuccessfully, @Tokens.Doctor)', 'success');
+                    $(".dx-loadpanel-content").hide();
+                      $('#table').dxDataGrid("instance").refresh();
+                });
+            },
+            remove: function (key) {
+                return abp.services.app.doctor.activateDeactivate(key, { async: false }).done(function () {
+                    if (isActive = true) {
+                    displayToast('@String.Format(@Messages.ObjectDeActivatedSuccessfully,@Tokens.Doctor)', 'success');
+                    } else {
+                    displayToast('@String.Format(@Messages.ObjectActivatedSuccessfully,@Tokens.Doctor)', 'success');
+                    }
+                    $(".dx-loadpanel-content").hide();
+                    $('#table').dxDataGrid("instance").refresh();
+                });
+            },
+        });
+
+        $(function () {
+            var types;
+            debugger
+
+            var dataGrid = $("#table").dxDataGrid({
+                dataSource: gridDataSource,
+                searchPanel: {
+                    visible: true,
+                    width: 240,
+                },
+                paging: {
+                    pageSize: 6,
+                    pageIndex: 1    // Shows the second page
+                },
+                headerFilter: {
+                    visible: true,
+                    allowSearch: true
+                },
+                filterRow: {
+                    visible: true,
+                    applyFilter: "auto"
+                },
+                sorting: {
+                    mode: "multiple"
+                },
+                columnsAutoWidth: true,
+                pager: {
+                    visible: true,
+                    showPageSizeSelector: true,
+                    allowedPageSizes: [5, 10, 25, 50],
+                    showInfo: true,
+                },
+                editing: {
+                    allowAdding: true,
+                    allowUpdating: true,
+                    allowDeleting: true,
+                    useIcons: true,
+                    texts: {
+                        addRow: "@Tokens.AddDoctor",
+                        confirmDeleteMessage: null,
+                        saveRowChanges: "@Tokens.Save",
+                        cancelRowChanges: "@Tokens.Cancel",
+                    },
+                    mode: "popup",
+                    popup: {
+                        showTitle: true,
+
+                        width: '700',
+                        height: '400',
+                        title: "@Tokens.DoctorInfo",
+                    },
+
+                    form: {
+                        itemType: "group",
+                        colCount: '2',
+                        colCountByScreen: {
+                            md: 4,
+                            sm: 2,
+                        },
+                        customizeItem: function (item) {
+                            if (item.dataField == "password") {
+                                if (isEditable) {
+                                    item.visible = false;
+                                    isEditable = false;
+                                }
+       
+                            }
+                       
+                    },
+                        //colCount: 9,
+                        //colSpan: 2,
+                        items: [
+                            {
+                                dataField: "name",
+                                dataType: "String",
+                                validationRules: [
+                                    {
+                                        type: "required", message: '@string.Format(DataAnnotations.Required, Tokens.Name)'
+                                    },
+                                ]
+                            }, {
+                                dataField: "surname",
+                                dataType: "String",
+                                validationRules: [
+                                    {
+                                        type: "required", message: '@string.Format(DataAnnotations.Required, Tokens.Surname)'
+                                    },
+                                      @*{
+                                        type: "string", message: '@string.Format(DataAnnotations., Tokens.Surname)'
+                                    },*@
+                                ]
+                            },
+
+
+                            {
+                                dataField: "phoneNumber",
+                                dataType: "String",
+                            },
+
+                            {
+                                dataField: "emailAddress",
+                                dataType: "Email",
+                                validationRules: [
+                                    {
+                                        type: "required", message: '@string.Format(DataAnnotations.Required, Tokens.EmailAddress)'
+                                    },
+                                    {
+                                        type: "email", message: '@string.Format(DataAnnotations.Email, Tokens.EmailAddress)'
+                                    },
+                                ]
+                            },
+                            {
+                                dataField: "clinicEmail",
+                                dataType: "email",
+                                validationRules: [
+                                    {
+                                        type: "required", message: '@string.Format(DataAnnotations.Required, Tokens.ClinicEmail)'
+                                    },
+                                    {
+                                        type: "email", message: '@string.Format(DataAnnotations.Email, Tokens.ClinicEmail)'
+                                    },
+                                ]
+                            },
+                            {
+                                dataField: "clinicPhone",
+                                dataType: "String",
+
+                            }, {
+                                dataField: "userName",
+                                dataType: "String",
+                                validationRules: [{
+                                    type: "required", message: '@string.Format(DataAnnotations.Required, Tokens.UserName)'
+                                },
+                                ]
+
+                            },
+                            {
+                                dataField: "password",
+                                label: { text: "Password" },
+
+                                editorType: "dxTextBox",
+                                editorOptions: {
+                                    //   dataSource: cities,
+                                    mode: 'password',
+                                    placeholder: 'Enter password',
+                                    showClearButton: true,
+                                    //disabled: true,
+                                },
+                                validationRules: [
+                                    {
+                                        type: "required", message: '@string.Format(DataAnnotations.Required, Tokens.Password)'
+                                    },
+                                ]
+                            },
+                            //{
+                            //    dataField: "isActive",
+                            //    caption: "Status",
+                            //    allowSorting: false,
+                            //    allowFiltering: false,
+                            //    allowSearch: false,
+                            //    lookup: {
+                            //        valueExpr: "id",
+                            //        displayExpr: "name",
+                            //        dataSource: [{ name: "Active", id: true }, { name: "InActive", id: false }]
+                            //    }
+                            //},
+                        ]
+                    }
+                },
+
+                @*onRowRemoving: function (e) {
+                    debugger
+                    displayToast(e, '@String.Format("Doctor was Activated successfully")');
+
+                },*@
+
+                onRowRemoving: function (e) {
+                    $(".dx-loadpanel-content").hide();
+                        if (e.data.isActive == true) {
+                            displayCOnfirmDelete(e, "@string.Format(@Messages.ConfirmDeactivateObject , Tokens.Doctor )");
+                            isActive = e.data.isActive;
+                        }
+                        else {
+                            displayCOnfirmDelete(e,"@string.Format(@Messages.ConfirmActivateObject , Tokens.Doctor)");
+                            isActive = e.data.isActive;
+                        }
+                },
+
+                columns: [
+                    {
+                        dataField: "id",
+                        caption: "@Tokens.Id",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                        allowEditing: false,
+                    }, {
+                        dataField: "name",
+                        dataType: "String",
+                        validationRules: [
+                            {
+                                type: "required", message: '@string.Format(DataAnnotations.Required, Tokens.Name)'
+                            },
+                        ]
+                    }, {
+                        dataField: "userName",
+                        dataType: "String",
+                        validationRules: [
+                            {
+                                type: "required", message: '@string.Format(DataAnnotations.Required, Tokens.UserName)'
+                            },
+                        ]
+                    }, {
+                        dataField: "password",
+                        label: { text: "Password" },
+
+                        validationRules: [
+                            {
+                                type: "required", message: '@string.Format(DataAnnotations.Required, Tokens.Password)'
+                            },
+                        ]
+                    },
+
+                    {
+                        dataField: "emailAddress",
+                        caption: "@Tokens.EmailAddress",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                    },
+                    {
+                        dataField: "surname",
+                        caption: "@Tokens.Surname",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                    },
+                    {
+                        dataField: "clinicPhone",
+                        caption: "@Tokens.ClinicPhone",
+                        allowFiltering: true,
+                        allowSorting: false,
+                        allowSearch: true,
+                    }, {
+                        dataField: "clinicEmail",
+                        caption: "@Tokens.ClinicEmail",
+                        allowFiltering: true,
+                        allowSorting: false,
+                        allowSearch: true,
+                    }, {
+                        dataField: "phoneNumber",
+                        caption: "@Tokens.PhoneNumber",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                    },
+
+
+
+
+
+
+                    {
+                        dataField: "creationTime",
+                        caption: "@Tokens.CreationDateandTime",
+                        dataType: "datetime",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                        sortIndex: 0,
+                        sortOrder: "desc",
+                    }, {
+                        dataField: "creatorUserName",
+                        caption: "@Tokens.Createdby",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                        allowEditing: false,
+                    },
+                    {
+                        dataField: "isActive",
+                        caption: "Status",
+                        allowSorting: false,
+                        allowFiltering: false,
+                        allowSearch: false,
+                        lookup: {
+                            valueExpr: "id",
+                            displayExpr: "name",
+                            dataSource: [{ name: "Active", id: true }, { name: "InActive", id: false }]
+                        }
+                    },
+
+                    @*{
+                        type: "buttons",
+                        buttons: ["delete1", {
+                            hint: "@Tokens.Delete",
+                            icon: "trach",
+                            onClick: function (e) {
+                              //  window.location.href = abp.appPath + "Sessions/Details/" + e.row.data.id;
+                            }
+                        },
+                        ]
+                    },*@
+                ],
+                masterDetail: {
+                    enabled: true,
+                    template: masterDetailTemplate
+                },
+                onEditingStart: function (e) {
+                    isEditable = true;
+                },
+                onCellPrepared: function (e) {
+                    if (e.rowType === "data" && e.columnIndex == 13) {
+                        var $links = e.cellElement.find(".dx-link-delete")
+                        if (e.row.data.isActive == false) {
+                            $links.removeClass('dx-icon-trash');
+                            $links.removeClass('dx-icon-close');
+                            $links.addClass('dx-icon-check');
+                            $links.attr('title', "Activate");
+                        }
+                        else {
+                            $links.removeClass('dx-icon-trash');
+                            $links.removeClass('dx-icon-check');
+                            $links.addClass('dx-icon-close');
+                            $links.attr('title', "Deactivate");
+                        }
+                        //else {
+                        //    $links.removeClass('dx-icon-trash');
+                        //     $links.removeClass('dx-icon-check');
+                        //    $links.addClass('dx-icon-close');
+                        //    $links.attr('title',"Deactivate");
+                        //}
+
+
+                    }
+                },
+                onRowExpanding: function (e) {
+
+                    e.component.collapseAll(-1);
+                },
+                remoteOperations: true,
+                //onRowUpdating: function (options) {
+                //    debugger;
+                //    options.newData = $.extend({}, options.oldData, options.newData);
+                //},
+            }).dxDataGrid("instance");
+        });
+
+         function masterDetailTemplate(_, masterDetailOptions) {
+
+
+            abp.services.app.doctor.get({ id: masterDetailOptions.data.id },
+                {
+                    async: false,
+                }).done(function (result) {
+                 //   debugger;
+                    detail = result;
+                });
+
+            return $("<div>").dxTabPanel({
+                items: [{
+                    title: "@Tokens.DoctorDetails",
+                    template: createPositionTabTemplate(detail)
+                }]
+            });
+        }
+
+        function createPositionTabTemplate(detail) {
+       //     debugger;
+            return function () {
+
+                return $("<div>").addClass("detail-form form-container").dxForm({
+                    formData: detail,
+                    readOnly: true,
+                    colCount: 'auto',
+                    items: [{ dataField: "id", label: { text: "@Tokens.Id" } },
+                        { dataField: "name", label: { text: "@Tokens.Name" } },
+                        { dataField: "userName", label: { text: "@Tokens.UserName" } },
+                        { dataField: "emailAddress", label: { text: "@Tokens.EmailAddress" } },
+                          {
+                        dataField: "isActive",
+                        caption: "Status",
+                        allowSorting: false,
+                               allowFiltering: false,
+                        allowSearch: false,
+                        lookup: {
+                            valueExpr: "id",
+                            displayExpr: "name",
+                            dataSource: [{ name: "Active", id: true }, { name: "InActive", id: false }]
+                        }
+                        },
+
+
+                        { dataField: "clinicPhone", label: { text: "@Tokens.ClinicPhone" } },
+                        { dataField: "clinicEmail", label: { text: "@Tokens.ClinicEmail" } },
+                        { dataField: "surname", label: { text: "@Tokens.Surname" } },
+                        { dataField: "phoneNumber", label: { text: "@Tokens.PhoneNumber" } },
+
+
+
+                    {
+                        dataField: "creationTime", label: { text: "@Tokens.CreationDate" }, editorType: "dxDateBox", editorOptions: {
+                            displayFormat: "MM/dd/yyyy hh:mm a",
+                            width: "100%",
+                        }
+                    },
+                    { dataField: "creatorUserName", label: { text: "@Tokens.Createdby" } },
+
+                    ],
+                });
+            }
+        }
+
+
+    </script>
+}

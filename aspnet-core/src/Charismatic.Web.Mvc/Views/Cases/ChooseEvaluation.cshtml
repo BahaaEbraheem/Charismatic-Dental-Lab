@@ -1,0 +1,58 @@
+﻿@using Charismatic.Web.Startup
+@using static Charismatic.Enums
+@model Charismatic.Web.Models.Cases.ChooseEvaluationViewModel
+@{
+    ViewData["Title"] = "ChooseEvaluation";
+    ViewBag.CurrentPageName = PageNames.Cases;
+}
+
+<h1 class="text-gray page-title">@Tokens.ChooseEvaluation</h1>
+<div class="container">
+
+    @await Component.InvokeAsync("CaseCreationWizard", CaseCreationStep.Evaluation)
+</div>
+<!-- Start Grey Black Box Page -->
+<section class="boxes-grey-black">
+    <div class="container">
+        <div class="row">
+            @foreach (var ev in Enum.GetValues(typeof(Enums.CaseEvaluationType)))
+            {
+                <div class="col-6 col-md-4">
+                    <div id="ev.@((int)ev)" class="box evaluation-choice" data-evaluation="@((int)ev)" data-case-id="@Model.CaseId">
+                        <h5 class="text-blue">@LocalizationHelper.GetString("Tokens", ev.ToString())</h5>
+                        <img class="img-fluid" src="~/img/case-evaluation/@((int)ev).png" alt="@ev">
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="container row text-center">
+            <div class="col-4 text-left"></div>
+            <div class="col-4"></div>
+            <div class="col-4 text-right">
+                <form id="chooseEvaluationFrm" asp-action="ChooseEvaluationSet" asp-antiforgery="true" method="post">
+                    <input type="hidden" asp-for="CaseId" />
+                    <input type="hidden" asp-for="EvaluationType" />
+                    <input type="submit" class="btn btn-custom bg-cyan" value="Next"/>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</section>
+<!-- End Grey Black Box Page -->
+@section scripts {
+<script>
+    $(document).ready(function () {
+        $('div.evaluation-choice').click((e) => {
+            const src = e.currentTarget;
+            const evaluation = $(src).data("evaluation");
+            $('div.evaluation-choice').removeClass("active");
+            $(src).addClass("active");
+            const caseId = $(src).data("case-id");
+            const _$form = $("#chooseEvaluationFrm");            
+            _$form.children("input[name='EvaluationType']").val(evaluation);
+        });
+    });
+    
+</script>
+}

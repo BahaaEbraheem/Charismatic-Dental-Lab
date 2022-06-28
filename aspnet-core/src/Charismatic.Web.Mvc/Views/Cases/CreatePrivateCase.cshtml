@@ -1,0 +1,144 @@
+﻿@using Charismatic.Web.Startup
+@using static Charismatic.Enums
+@model Charismatic.Web.Models.Cases.CreatePrivateCaseViewModel
+@{
+    ViewData["Title"] = Tokens.CreatePrivateCase;
+    ViewBag.CurrentPageName = PageNames.Cases;
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/libs/intl-tel-input/css/intlTelInput.css" />
+    <link href="~/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+}
+
+<h1 class="text-gray page-title">@Tokens.CreatePrivateCase</h1>
+
+
+<div class="container">
+    @await Component.InvokeAsync("CaseCreationWizard",CaseCreationStep.PatientInfo) 
+    <form id="paitentInfo" class="form-vertical" method="post" asp-action="CreatePrivateCase">
+        <div class="bg-grey-form">
+
+            <div class="form-group text-left">
+                <input class="form-control" asp-for="FirstName" aria-describedby="firstName" placeholder="@Tokens.FirstName" />
+                <div class="invalid-feedback">
+                    <span asp-validation-for="FirstName"></span>
+                </div>
+            </div>
+            <div class="form-group text-left">
+                <input class="form-control" asp-for="LastName" aria-describedby="lastName" placeholder="@Tokens.LastName" />
+                <div class="invalid-feedback">
+                    <span asp-validation-for="LastName"></span>
+                </div>
+            </div>
+            <div class="form-group text-left">
+                <input asp-for="Email" class="form-control" placeholder="@Tokens.Email" />
+                <div class="invalid-feedback">
+                    <span asp-validation-for="Email"></span>
+                </div>
+            </div>
+            <div class="form-group text-left">
+                <input class="form-control" asp-for="PhoneNumber" aria-describedby="PhoneNumber" />
+                <div class="invalid-feedback">
+                    <span asp-validation-for="PhoneNumber"></span>
+                </div>
+            </div>
+            <div class="form-group text-left">
+                <input type="text" id="DateOfBirth" name="DateOfBirth" class="form-control" placeholder="@Tokens.Birthday" required/>
+                <div class="invalid-feedback">
+                    <span asp-validation-for="DateOfBirth"></span>
+                </div>
+            </div>
+            <div class="form-group text-left">
+                <label class="text-blue h5" asp-for="StreetAddress">@Tokens.StreetAddress</label>
+                <input type="text" class="form-control" placeholder="@Tokens.StreetAddress" name="StreetAddress" value="@Model.StreetAddress" />
+            </div>
+            <div class="form-group text-left">
+                <label class="text-blue h5" asp-for="BuildingName">@Tokens.BuildingName</label>
+                <input type="text" class="form-control" placeholder="@Tokens.BuildingName" name="BuildingName" value="@Model.BuildingName" />
+            </div>
+            <div class="form-group text-left">
+                <label class="text-blue h5" asp-for="CountryId">@Tokens.Country</label>
+                <select asp-for="CountryId" asp-items="Model.Countries" class="form-control">
+                    <option selected="selected" value="">@Tokens.Country</option>
+                </select>
+                <div class="invalid-feedback">
+                    <span asp-validation-for="CountryId"></span>
+                </div>
+            </div>
+            <div class="form-group text-left">
+                <label class="text-blue h5" asp-for="StateId">@Tokens.City</label>
+                <select asp-for="StateId" class="form-control">
+                    <option selected="selected" value="">@Tokens.City</option>
+                </select>
+            </div>
+            <div class="form-group text-left">
+                <label class="text-blue h5" asp-for="Gender">@Tokens.Gender</label>
+                <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()" class="form-control">
+                    <option selected="selected" value="">@Tokens.ChooseGender</option>
+                </select>
+                <div class="invalid-feedback">
+                    <span asp-validation-for="Gender"></span>
+                </div>
+            </div>
+        </div>
+        <!-- Wizard controls start-->
+        <div class="container row text-center">
+            <div class="col-4 text-left"></div>
+            <div class="col-4"></div>
+            <div class="col-4 text-right">
+                <button type="submit" class="btn btn-custom bg-cyan">@Tokens.Next</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+@section scripts {
+    <script src="~/libs/intl-tel-input/js/intlTelInput.min.js"></script>
+    <script src="~/libs/intl-tel-input/js/utils.min.js"></script>
+    <script src="~/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script>
+        function getIp(callback) {
+            fetch('https://ipinfo.io/json?token=69b14fdf24485d', { headers: { 'Accept': 'application/json' } })
+                .then((resp) => resp.json())
+                .catch(() => {
+                    return {
+                        country: 'ae',
+                    };
+                })
+                .then((resp) => callback(resp.country));
+        }
+        const phoneInputField = document.querySelector("#PhoneNumber");
+        const phoneInput = window.intlTelInput(phoneInputField, {
+            separateDialCode: true,
+            utilsScript: "~/libs/intl-tel-input/js/utils.min.js",
+            initialCountry: "auto",
+            geoIpLookup: getIp
+        });
+        $('#DateOfBirth').datepicker({
+            autoclose: true
+        });
+        $('#CountryId').on('change', function () {
+            countryId = $(this).val();
+            if (countryId !== '') {
+                $('#StateId').attr('disabled', true);
+                $('#StateId').empty();
+                $('#StateId').append($("<option />").text('@Tokens.GettingCities'));
+                abp.services.app.states.getAll({ countryId: countryId }).done(function (data) {
+                    var $dropdown = $("#StateId");
+                    $dropdown.empty();
+                    $dropdown.append($("<option />").text('@Tokens.City'));
+                    $.each(data.items, function () {
+                        $dropdown.append($("<option />").val(this.id).text(this.name));
+                    });
+                    $('#StateId').attr('disabled', false);
+                });
+            }
+            else {
+                 $('#StateId').empty();
+                 $('#StateId').append($("<option />").text('@Tokens.City'));
+            }
+        });
+    </script>
+}

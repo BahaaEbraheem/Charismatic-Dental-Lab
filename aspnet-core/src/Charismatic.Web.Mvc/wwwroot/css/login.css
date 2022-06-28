@@ -1,0 +1,108 @@
+/*
+    GLOBAL STYLE
+    ---------------------------
+*/
+.img-responsive {
+    width: 100%;
+    height: 100%;
+}
+
+
+
+/*
+    LOGIN PAGE
+    ---------------------------
+*/
+.login-page {
+    width: 100vw;
+    height: 100vh;
+    background: url('../img/bg-login.png') center center no-repeat;
+    background-size: cover;
+}
+
+.login-page .login-box {
+    transform: translateY(15vh);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 5px 5px 15px #999, 
+                -1px -1px 15px -2px #eee;
+}
+
+.login-page h6 {
+    color: #999;
+}
+
+.login-page h5 {
+    font-weight: 900;
+    color: #555;
+}
+
+.login-page h5 span {
+    color: #288ab9;
+}
+
+.login-page p {
+    color: #999;
+    font-size: .8rem;
+}
+
+form .input-group-text {
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    background: transparent;
+    border-right: none;
+    border-top: 1px solid #288ab9;
+    border-bottom: 1px solid #288ab9;
+    border-left: 1px solid #288ab9;
+    color: #999;
+}
+
+form input {
+    height: 35px;
+    line-height: 1 !important;
+}
+
+form .custom-input {
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border-left: none;
+    padding: 0;
+    border-top: 1px solid #288ab9;
+    border-bottom: 1px solid #288ab9;
+    border-right: 1px solid #288ab9;
+}
+
+form .custom-input:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: #288ab9;
+}
+
+form .btn-custom {
+    background: #555;
+    border-radius: 20px;
+    color: #fff;
+}
+
+.line .side-line {
+    width: 40%;
+    display: inline-block;
+    vertical-align: middle;
+    height: 1px;
+    background-color: rgba(108, 117, 125, .36);
+}
+
+.line .content-line {
+    width: 15%;
+    display: inline-block;
+    color: #999;
+    font-size: .8rem;
+}
+
+.social-media li {
+    border-radius: 50%;
+    box-shadow: 0px 0px 6px 0px #999;
+    width: 25px;
+    height: 25px;
+    margin: 5px;
+}

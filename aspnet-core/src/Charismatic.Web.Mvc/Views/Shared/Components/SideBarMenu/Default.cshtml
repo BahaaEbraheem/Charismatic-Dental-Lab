@@ -1,0 +1,13 @@
+﻿@using Charismatic.Web.Views.Shared.Components.SideBarMenu
+@model SideBarMenuViewModel
+@{ 
+    var orderedMenuItems = Model.MainMenu.Items.Where(x => x.IsVisible).ToList();
+}
+<ul class="navbar-nav mr-auto">
+    @{ foreach (var item in orderedMenuItems)
+        {
+                         @await Html.PartialAsync("Components/SideBarMenu/_MenuItem", item) 
+        }
+     }
+
+</ul>

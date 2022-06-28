@@ -1,0 +1,329 @@
+﻿@using Charismatic.Web.Startup
+@{
+    ViewBag.CurrentPageName = PageNames.ProductsIndex; // The menu item will be active for this page. }
+}
+
+<div class="table-header">
+    @*@await Component.InvokeAsync(typeof(ContentHeaderViewComponent), new { PageName = Tokens.Products })*@
+
+    <h3 class="text-blue"> @Tokens.ProductsIndex</h3>
+</div><!--.table-header-->
+
+<div class="bg-table-grey">
+    <div class="table-responsive">
+        <div id="table"></div>
+    </div>
+</div>
+
+@section styles {
+<style>
+
+    .form-container {
+        padding: 20px;
+    }
+
+    .detail-form label {
+        font-weight: bold;
+    }
+</style>
+}
+
+@section scripts {
+<script>
+                 // confirm delete message
+    function errorMessage(event , message) {
+          var result = DevExpress.ui.dialog.custom({
+                showTitle: false,
+              dragEnabled: false,
+              messageHtml: `<div><h4>${message}</h4></div>`,
+                buttons: [
+                    {
+                        text:"@Tokens.Ok",
+                        type: "normal",
+                        width: 120,
+                        onClick: function (event) {
+                            return false;
+                        }
+                    }]
+            });
+            event.cancel = $.Deferred(function (deferred) {
+                result.show().done(function (result) {
+                    deferred.resolve(!result);
+            });
+            }).promise();
+    }
+
+
+        var gridDataSource = new DevExpress.data.DataSource({
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                abp.services.app.product.getAllProducts({
+                    filter: loadOptions.filter ? JSON.stringify(loadOptions.filter) : "", // Pass if filtering is remote
+                    sorting: loadOptions.sort ? JSON.stringify(loadOptions.sort) : "",       // Pass if sorting is remote
+                    skipCount: loadOptions.skip >= 0 ? loadOptions.skip : 0,     // The number of records to skip
+                    maxResultCount: loadOptions.take > 0 ? loadOptions.take : 100,     // The number of records to take
+                    requireTotalCount: true,   // A flag telling the server whether the total count of records (totalCount) is required
+
+                }).done(function (result) {
+                    debugger;
+                    result.data = result.items;
+                    // You can process the received data here
+                    d.resolve(result, {
+                        //totalCount: result.result.totalCount,
+                    });
+                });
+                return d.promise();
+            },
+            insert: function (values) {
+                debugger;
+                return abp.services.app.product.create(values).done(function () {
+                    displayToast('@String.Format(@Messages.ObjectAddedSuccessfully,@Tokens.Product)', 'success');
+                    $(".dx-loadpanel-content").hide();
+                });
+            },
+            update: function (key, values) {
+                debugger;
+                return abp.services.app.product.update(values).done(function () {
+                    displayToast('@String.Format(@Messages.ObjectUpdatedSuccessfully, @Tokens.Product)', 'success');
+                    $(".dx-loadpanel-content").hide();
+                      $('#table').dxDataGrid("instance").refresh();
+                });
+            },
+            remove: function (key) {
+                return abp.services.app.product.delete(key, { async: false }).done(function () {
+                   displayToast( '@String.Format(@Messages.ObjectDeleedSuccessfully,@Tokens.Product)' , 'success');
+                    $(".dx-loadpanel-content").hide();
+                    $('#table').dxDataGrid("instance").refresh();
+                });
+            },
+        });
+
+        $(function () {
+            var types;
+            var dataGrid = $("#table").dxDataGrid({
+                dataSource: gridDataSource,
+                searchPanel: {
+                    visible: true,
+                    width: 240,
+                },
+                paging: {
+                    pageSize: 5,
+                    pageIndex: 0 //start at first page
+                },
+                headerFilter: {
+                    visible: true,
+                    allowSearch: true
+                },
+                filterRow: {
+                    visible: true,
+                    applyFilter: "auto"
+                },
+                sorting: {
+                    mode: "multiple"
+                },
+                columnsAutoWidth: true,
+                pager: {
+                    visible: true,
+                    showPageSizeSelector: true,
+                    allowedPageSizes: [5, 10, 25, 50],
+                    showInfo: true,
+                },
+                editing: {
+                    allowAdding: true,
+                    allowUpdating: true,
+                    allowDeleting: true,
+                    useIcons: true,
+                    texts: {
+                        addRow: "@Tokens.AddProduct",
+                        confirmDeleteMessage: null,
+                        saveRowChanges: "@Tokens.Save",
+                        cancelRowChanges: "@Tokens.Cancel",
+                    },
+                    mode: "popup",
+                    popup: {
+                        width: 500,
+                        height: 500,
+                        title: "@Tokens.ProductInfo",
+                    },
+
+                    form: {
+                        itemType: "group",
+                        colCount: 1,
+                        colSpan: 1,
+                        items:
+                        [ "name","price","image"]
+                    }
+                },
+                columns: [{
+                        dataField: "id",
+                        caption: "@Tokens.Id",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                        allowEditing: false,
+                    },
+                    {
+                        dataField: "image",
+                        cellTemplate: productImageCellTemplate,
+                        editCellTemplate: productImageEditCellTemplate
+                    },
+                    {
+                        dataField: "name",
+                        caption: "@Tokens.Name",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                        allowEditing: true,
+                        allowUpdating:true,
+                        validationRules:
+                        [
+                            {
+                                type: "required",
+                                message: '@string.Format(DataAnnotations.Required, Tokens.Name)'
+                            },
+                            {
+                                type: "pattern",
+                                message: '@string.Format(DataAnnotations.NameFormat, Tokens.Name)',
+                                pattern: '@CharismaticConsts.NameFormat'.replace("&#x2B;", "+")
+                            }
+                        ]
+                    },
+                    {
+                        dataField: "price",
+                        caption: "@Tokens.Price",
+                        dataType: "currency",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                        allowEditing: true,
+                        validationRules:
+                        [
+                            {
+                                type: "required",
+                                message: '@string.Format(DataAnnotations.Required, Tokens.Price)'
+                            },
+                            {
+                                type: "numeric",
+                                message: '@string.Format(Messages.InputMustBeNumeric,Tokens.Price)'
+                            }
+                        ]
+                    },
+                    {
+                        dataField: "creationTime",
+                        caption: "@Tokens.CreationDateandTime",
+                        dataType: "datetime",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                        sortIndex: 0,
+                        sortOrder: "desc",
+                    },
+                    {
+                        dataField: "creatorUserName",
+                        caption: "@Tokens.Createdby",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: false,
+                        allowEditing: false,
+                    }
+                ],
+                masterDetail: {
+                    enabled: true,
+                    template: masterDetailTemplate
+                },
+                remoteOperations: true,
+                onRowExpanding: function (e) {
+
+                    e.component.collapseAll(-1);
+                },
+                onRowRemoving: function (e) {
+                    displayCOnfirmDelete(e, '@String.Format(@Messages.ConfirmDeleteObject,@Tokens.Product)');
+                },
+                //onRowUpdating: function (options) {
+                //    debugger;
+                //    options.newData = $.extend({}, options.oldData, options.newData);
+                //},
+            }).dxDataGrid("instance");
+        })
+         function masterDetailTemplate(_, masterDetailOptions) {
+
+
+            abp.services.app.product.get({ id: masterDetailOptions.data.id },
+                {
+                    async: false,
+                }).done(function (result) {
+                    debugger;
+                    detail = result;
+                });
+
+            return $("<div>").dxTabPanel({
+                items: [{
+                    title: "@Tokens.ProductDetails",
+                    template: createPositionTabTemplate(detail)
+                }]
+            });
+        }
+
+        function createPositionTabTemplate(detail) {
+            debugger;
+            return function () {
+
+                return $("<div>").addClass("detail-form form-container").dxForm({
+                    formData: detail,
+                    readOnly: true,
+                    colCount: 2,
+                    items: [{ dataField: "id", label: { text: "@Tokens.Id" } },
+                    { dataField: "name", label: { text: "@Tokens.Name" }  },
+
+
+
+
+                    {
+                        dataField: "creationTime", label: { text: "@Tokens.CreationDate" }, editorType: "dxDateBox", editorOptions: {
+                            displayFormat: "MM/dd/yyyy hh:mm a",
+                            width: "100%",
+                        }
+                    },
+                    { dataField: "creatorUserName", label: { text: "@Tokens.Createdby" } },
+
+                    ],
+                });
+            }
+        }
+
+        function productImageCellTemplate(container, options){
+            //console.log("data:image/png;base64,"+options.value);
+            //let img = $("img");
+            //img.attr("src","data:image/png;base64,"+options.value);
+            //$(container).append(img);
+            let imageElement = document.createElement("img");
+            imageElement.setAttribute("src", options.value);
+            imageElement.setAttribute("height", "60px");
+            imageElement.setAttribute("width", "60px");
+            container.append(imageElement);
+        }
+
+        function productImageEditCellTemplate(cellElement, cellInfo) {
+            let fileUploaderElement = document.createElement("input");
+            fileUploaderElement.setAttribute("type","file");
+            fileUploaderElement.onchange = (ev)=>{
+                let reader = new FileReader();
+                reader.onload = function(args) {
+                    imageElement.setAttribute("src", args.target.result);
+                    cellInfo.setValue(args.target.result);
+                }
+                reader.readAsDataURL(ev.target.files[0]); // convert to base64 string
+            };
+
+            let imageElement = document.createElement("img");
+            imageElement.classList.add("uploadedImage");
+            imageElement.setAttribute("src", cellInfo.value);
+            imageElement.setAttribute("height", "120px");
+            imageElement.setAttribute("width", "120px");
+            cellElement.append(imageElement);
+            cellElement.append(fileUploaderElement);
+        }
+
+
+</script>
+}

@@ -1,0 +1,273 @@
+﻿@using Charismatic.Web.Startup
+@{ ViewBag.CurrentPageName = PageNames.Specialties; // The menu item will be active for this page. }
+}
+@await Component.InvokeAsync(typeof(ContentHeaderViewComponent), new { PageName = Tokens.Specialties })
+<div class="content-body">
+    <div class="col-md-12" style="background-color: white; padding: 10px 20px 10px 20px" ;>
+        <div id="table"></div>
+    </div>
+</div>
+@section styles {
+    <style>
+
+        .form-container {
+            padding: 20px;
+        }
+
+        .detail-form label {
+            font-weight: bold;
+        }
+    </style>
+}
+
+@section scripts {
+    <script>
+                 // confirm delete message
+    function errorMessage(event , message) {
+          var result = DevExpress.ui.dialog.custom({
+                showTitle: false,
+              dragEnabled: false,
+              messageHtml: `<div><h4>${message}</h4></div>`,
+                buttons: [
+                    {
+                        text:"@Tokens.Ok",
+                        type: "normal",
+                        width: 120,
+                        onClick: function (event) {
+                            return false;
+                        }
+                    }]
+            });
+            event.cancel = $.Deferred(function (deferred) {
+                result.show().done(function (result) {
+                    deferred.resolve(!result);
+            });
+            }).promise();
+    }
+
+        @*var reasonType;
+        abp.services.app.enumHelper.getEnumAsList("@typeof(ITLand.CMMS.ReasonTypes)", {
+            async: false,
+        }).done(function (result) {
+            reasonType = result;
+        });*@
+        var gridDataSource = new DevExpress.data.DataSource({
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                abp.services.app.specialty.getAllSpecialties({
+                    filter: loadOptions.filter ? JSON.stringify(loadOptions.filter) : "", // Pass if filtering is remote
+                    sorting: loadOptions.sort ? JSON.stringify(loadOptions.sort) : "",       // Pass if sorting is remote
+                    skipCount: loadOptions.skip >= 0 ? loadOptions.skip : 0,     // The number of records to skip
+                    maxResultCount: loadOptions.take > 0 ? loadOptions.take : 100,     // The number of records to take
+                    requireTotalCount: true,   // A flag telling the server whether the total count of records (totalCount) is required
+
+                }).done(function (result) {
+                    debugger;
+                    result.data = result.items;
+                    // You can process the received data here
+                    d.resolve(result, {
+                        //totalCount: result.result.totalCount,
+                    });
+                });
+                return d.promise();
+            },
+            insert: function (values) {
+                debugger;
+                return abp.services.app.specialty.create(values).done(function () {
+                    displayToast('@String.Format(@Messages.ObjectAddedSuccessfully,@Tokens.Specialty)', 'success');
+                    $(".dx-loadpanel-content").hide();
+                });
+            },
+            update: function (key, values) {
+                debugger;
+                return abp.services.app.specialty.update(values).done(function () {
+
+
+                    displayToast('@String.Format(@Messages.ObjectUpdatedSuccessfully, @Tokens.Specialty)', 'success');
+                    $(".dx-loadpanel-content").hide();
+                      $('#table').dxDataGrid("instance").refresh();
+                });
+            },
+            remove: function (key) {
+                return abp.services.app.specialty.delete(key, { async: false }).done(function () {
+                   displayToast( '@String.Format(@Messages.ObjectDeleedSuccessfully,@Tokens.Specialty)' , 'success');
+                    $(".dx-loadpanel-content").hide();
+                    $('#table').dxDataGrid("instance").refresh();
+                });
+            },
+        });
+
+        $(function () {
+            var types;
+            var dataGrid = $("#table").dxDataGrid({
+
+                dataSource: gridDataSource,
+                searchPanel: {
+                    visible: true,
+                    width: 240,
+                },
+                paging: {
+                    pageSize: 6,
+                    pageIndex: 1    // Shows the second page
+                },
+                headerFilter: {
+                    visible: true,
+                    allowSearch: true
+                },
+                filterRow: {
+                    visible: true,
+                    applyFilter: "auto"
+                },
+                sorting: {
+                    mode: "multiple"
+                },
+                columnsAutoWidth: true,
+                pager: {
+                    visible: true,
+                    showPageSizeSelector: true,
+                    allowedPageSizes: [5, 10, 25, 50],
+                    showInfo: true,
+                },
+                editing: {
+                    allowAdding: true,
+                    allowUpdating: true,
+                    allowDeleting: true,
+                    useIcons: true,
+                    texts: {
+                        addRow: "@Tokens.AddSpecialty",
+                        confirmDeleteMessage: null,
+                        saveRowChanges: "@Tokens.Save",
+                        cancelRowChanges: "@Tokens.Cancel",
+                    },
+                    mode: "popup",
+                    popup: {
+                        width: 500,
+                        height: 300,
+                        title: "@Tokens.SpecialtyInfo",
+                    },
+
+                    form: {
+                        itemType: "group",
+                        colCount: 1,
+                        colSpan: 2,
+                        items: [
+                            {
+                                dataField: "name",
+                                validationRules: [
+                                    {
+                                        type: "required", message: '@string.Format(DataAnnotations.Required, Tokens.Name)'
+                                    }, {
+                                        type: "pattern",
+                                        message: '@string.Format(DataAnnotations.NameFormat, Tokens.Name)',
+                                        pattern: '@CharismaticConsts.NameFormat'.replace("&#x2B;", "+")
+                                    },
+
+
+                                ]
+                            }]
+                    }
+                },
+
+                onRowRemoving: function (e) {
+                    displayCOnfirmDelete(e, '@String.Format(@Messages.ConfirmDeleteObject,@Tokens.Specialty)');
+
+                },
+
+
+                columns: [
+                    {
+                        dataField: "id",
+                        caption: "@Tokens.Id",
+                        allowFiltering: true,
+                        allowSorting: true,
+                        allowSearch: true,
+                        allowEditing: false,
+                    },
+                    {
+                        dataField: "name",
+                        caption: "@Tokens.Name",
+                        allowFiltering: true,
+                        allowSorting: false,
+                        allowSearch: true,
+                    },
+                    {
+                        dataField: "creationTime",
+                        caption: "@Tokens.CreationDateandTime",
+                        dataType: "datetime",
+                        allowFiltering: false,
+                        allowSorting: true,
+                        allowSearch: false,
+                        sortIndex: 0,
+                        sortOrder: "desc",
+                    }, {
+                        dataField: "creatorUserName",
+                        caption: "@Tokens.Createdby",
+                        allowFiltering: false,
+                        allowSorting: false,
+                        allowSearch: true,
+                        allowEditing: false,
+                    },
+                ],
+                masterDetail: {
+                    enabled: true,
+                    template: masterDetailTemplate
+                },
+
+                onRowExpanding: function (e) {
+
+                    e.component.collapseAll(-1);
+                },
+                remoteOperations: true,
+                //onRowUpdating: function (options) {
+                //    debugger;
+                //    options.newData = $.extend({}, options.oldData, options.newData);
+                //},
+            }).dxDataGrid("instance");
+        })
+         function masterDetailTemplate(_, masterDetailOptions) {
+             abp.services.app.specialty.get({ id: masterDetailOptions.data.id },
+                {
+                    async: false,
+                }).done(function (result) {
+                    debugger;
+                    detail = result;
+                });
+
+            return $("<div>").dxTabPanel({
+                items: [{
+                    title: "@Tokens.SpecialtyDetails",
+                    template: createPositionTabTemplate(detail)
+                }]
+            });
+        }
+
+        function createPositionTabTemplate(detail) {
+            debugger;
+            return function () {
+
+                return $("<div>").addClass("detail-form form-container").dxForm({
+                    formData: detail,
+                    readOnly: true,
+                    colCount: 2,
+                    items: [{ dataField: "id", label: { text: "@Tokens.Id" } },
+                    { dataField: "name", label: { text: "@Tokens.Name" }  },
+
+
+
+
+                    {
+                        dataField: "creationTime", label: { text: "@Tokens.CreationDate" }, editorType: "dxDateBox", editorOptions: {
+                            displayFormat: "MM/dd/yyyy hh:mm a",
+                            width: "100%",
+                        }
+                    },
+                    { dataField: "creatorUserName", label: { text: "@Tokens.Createdby" } },
+
+                    ],
+                });
+            }
+        }
+
+
+    </script>
+}

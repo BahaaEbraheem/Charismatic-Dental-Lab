@@ -1,0 +1,221 @@
+﻿@using Abp.Authorization.Users
+@model Charismatic.Web.Models.Account.RegisterViewModel
+@{
+    ViewBag.Title = L("Register");
+}
+@section scripts
+    {
+    <environment names="Development">
+        <script src="~/view-resources/Views/Account/Register.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Views/Account/Register.min.js" asp-append-version="true"></script>
+    </environment>
+}
+
+
+<link href="~/js/views/vanillaSelectBox/vanillaSelectBox.css" rel="stylesheet" />
+<link href="~/css/select2.min.css" rel="stylesheet" />
+<script src="~/libs/jquery/jquery.min.js"></script>
+<script src="~/libs/jquery-validate/jquery.validate.js"></script>
+<script src="~/js/select2.min.js"></script>
+<script src="~/js/views/vanillaSelectBox/vanillaSelectBox.js"></script>
+
+<style>
+    .container-fluid {
+        width: 90%;
+    }
+    form .custom-input {
+        border-bottom-left-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+    form#RegisterForm {
+        background-color: grey;
+    }
+  /*  div.login-page {
+        background-color:darkgrey
+    }
+    body {
+        background-color: darkgrey;
+    }*/
+</style>
+
+<form id="RegisterForm" asp-action="Register" method="post">
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-warning"></i> @ViewBag.ErrorMessage
+        </div>
+    }
+    <input type="hidden" name="IsExternalLogin" value="@Model.IsExternalLogin.ToString()" />
+    <input type="hidden" name="ExternalLoginAuthSchema" value="@Model.ExternalLoginAuthSchema" />
+
+    <table>
+        <tbody id="datatableEnter">
+        </tbody>
+    </table>
+
+
+    <div class="container-fluid body-content">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h1 class="text-center">Register Doctor</h1>
+                <p class="lead"></p>
+            </div>
+
+
+            <div class="panel-body">
+                <div class="row form-inline">
+                    <div class="input-group mb-3 col-sm-6">
+                        <input id="Name" type="text" name="Name" class="form-control custom-input" placeholder="@Tokens.Name" value="@Model.Name" required maxlength="@AbpUserBase.MaxNameLength">
+                    </div>
+                    <div class="input-group mb-3 col-sm-6">
+                        <input type="text" name="Surname" class="form-control custom-input" placeholder="@Tokens.Surname" value="@Model.Surname" required maxlength="@AbpUserBase.MaxSurnameLength">
+                    </div>
+                </div>
+                <div class="form-controle mb-3 col-sm-12">
+                    <select id="example" multiple="multiple" class="form-control custom-input" name="SpecialtyList" asp-items="@ViewBag.SpecialtyList" required>
+                    </select>
+                </div>
+
+                <script>
+
+                    $('#example').select2({
+                        tags: true,
+                        allowClear: true,
+                        placeholder: "Select Or Add Specialty",
+                        createTag: function (params) {
+                            var term = $.trim(params.term);
+                            if (term === '') {
+                                return null;
+                            }
+                            return {
+                                id: term,
+                                text: term,
+                                newTag: true // add additional parameters
+                            }
+                        }
+                    });
+
+
+                </script>
+
+                <div class="row form-inline">
+                    <div class="input-group mb-3 col-sm-6">
+                        <input type="email" name="EmailAddress" class="form-control custom-input" placeholder="@Tokens.EmailAddress" value="@Model.EmailAddress" required maxlength="@AbpUserBase.MaxEmailAddressLength">
+                    </div>
+                    <div class="input-group mb-3 col-sm-6">
+                        <input type="text" name="Doctor.PhoneNumber" class="form-control custom-input" placeholder="@Tokens.PhoneNumber" required>
+                    </div>
+                </div>
+                <div class="row form-inline">
+                    <div class="input-group mb-3 col-sm-6">
+                        <input type="text" name="Doctor.ResponsipleName" class="form-control custom-input" placeholder="@Tokens.ResponsipleName" required>
+
+                    </div>
+                    <div class="input-group mb-3 col-sm-6">
+                        <input type="text" name="Doctor.ResponsiplePhone" class="form-control custom-input" placeholder="@Tokens.ResponsiplePhone"  required>
+
+                    </div>
+                </div>
+                <div class="row form-inline">
+                    <div class="input-group mb-3 col-sm-6">
+                        <input type="text" class="form-control custom-input" id="ClinicPhone"  placeholder="@Tokens.ClinicPhone"  name="Doctor.ClinicPhone" required>
+                    </div>
+                    <div class="input-group mb-3 col-sm-6">
+                        <input type="email" class="form-control custom-input" id="ClinicEmail" placeholder="@Tokens.ClinicEmail" name="Doctor.ClinicEmail">
+                    </div>
+                </div>
+                <div class="row form-inline">
+                    <div class="input-group mb-3 col-sm-6">
+                        <input type="text" name="UserName" class="form-control custom-input" placeholder="@Tokens.UserName" value="@Model.UserName" required maxlength="@AbpUserBase.MaxUserNameLength" />
+
+                    </div>
+                    <div class="input-group mb-3 col-sm-6">
+                        <input type="password" name="Password" class="form-control custom-input" placeholder="@Tokens.Password" required maxlength="@AbpUserBase.MaxPlainPasswordLength" />
+                    </div>
+                </div>
+                <div id="repeater">
+                    <div class="repeater-heading">
+                        <button type="button" class="btn btn-primary repeater-add-btn mb-3">
+                            Add Center
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="items" data-group="CenterList">
+                        <div class="item-content">
+
+
+                            <div class="row form-inline">
+                                <div class="input-group mb-3 col-sm-6">
+                                    <input type="text" class="form-control custom-input" id="Name" placeholder="@Tokens.Name" data-name="Name" required />
+                                </div>
+                                <div class="input-group mb-3 col-sm-6">
+                                    <select id="vv" class="form-control custom-input" data-name="Country.Id" asp-items="@ViewBag.CountryList">
+                                        <option value="0">@Tokens.SelectCountry</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row form-inline">
+                                <div class="input-group mb-3 col-sm-6">
+                                    <input type="text" class="form-control custom-input" id="Building" placeholder="@Tokens.Build" data-name="Building">
+                                </div>
+                                <div class="input-group mb-3 col-sm-6">
+                                    <input type="text" class="form-control custom-input" id="Street" placeholder="@Tokens.Street" data-name="Street">
+                                </div>
+
+                            </div>
+                            <div class="row form-inline">
+                                <div class="input-group mb-3 col-sm-6">
+                                    <input type="text" class="form-control custom-input" id="City" placeholder="@Tokens.City" data-name="City">
+                                </div>
+                                <div class="input-group mb-3 col-sm-6">
+                                    <input type="email" class="form-control custom-input" id="AccountEmail" placeholder="@Tokens.AccountEmail" data-name="AccountEmail">
+                                </div>
+                            </div>
+
+                            @*<div class="pull-right repeater-remove-btn">*@
+                            <button type="button" class="btn btn-danger repeater-remove-btn mb-3">
+                                Remove
+                            </button>
+                            @*</div>*@
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-8">
+                        <a asp-action="Login" class="btn btn-custom btn-flat"><i class="fa fa-arrow-circle-left"></i> @Tokens.Back</a>
+                    </div>
+
+                    <div class="col-4">
+                        <input type="submit" id="RegisterButton" class="btn btn-primary btn-flat float-right" value="@Tokens.Register" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="~/js/views/reg/repeater.js"></script>
+    <script>
+        $("#repeater").createRepeater({
+            showFirstItemToDefault: true,
+        });
+        /*        $('.custom-input').select2();*/
+
+        //$('select').select2();
+        /* $('[data-name = "Name"]').select2()*/
+
+        $('[data-name = "Country.Id"]').select2();
+
+    </script>
+
+</form>
+
+
+

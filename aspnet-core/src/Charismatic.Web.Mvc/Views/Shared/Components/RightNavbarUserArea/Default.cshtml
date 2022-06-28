@@ -1,0 +1,47 @@
+﻿@model Charismatic.Web.Views.Shared.Components.RightNavbarUserArea.RightNavbarUserAreaViewModel
+@*<li class="nav-item dropdown nav-user-menu">
+    <a href="javascript:void(0);" class="nav-link" data-toggle="dropdown" role="button">*@
+<li class="nav-item dropdown nav-user-menu">
+
+    <a href="javascript:void(0);" class="nav-link1" data-toggle="dropdown">
+        <p class="text-white d-inline-block">User: <span>@User.Identity.Name</span></p>
+        <img src="~/img/profile-icon.png" class="mr-sm-4 ml-sm-2" alt="">
+    </a>
+    <div class="dropdown-menu dropdown-menu-right">
+        @*<a class="dropdown-item" asp-controller="Users" asp-action="ChangePassword">
+                <i class="fas fa-user-edit"></i> @L("UpdatePassword")
+            </a>
+            <a class="dropdown-item" asp-controller="Home" asp-action="MyProfile">
+                <i class="fas fa-user-edit"></i> @Tokens.MyProfile
+            </a>*@
+        <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
+            <i class="fas fa-sign-out-alt"></i> @L("Logout")
+        </a>
+    </div>
+</li>
+
+<style>
+    .nav-link1{
+        display:block
+    }
+</style>
+
+
+@*<i class="fas fa-sign-out-alt"></i> @L("Logout")*@
+
+@*</a>*@
+@*<div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" asp-controller="Users" asp-action="ChangePassword">
+            <i class="fas fa-user-edit"></i> @L("UpdatePassword")
+        </a>
+        <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
+            <i class="fas fa-sign-out-alt"></i> @L("Logout")
+        </a>
+        <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
+                <i class="fas fa-sign-out-alt"></i> @L("Logout")
+            </a>
+    </div>*@
+@*</li>*@
+
+
+
